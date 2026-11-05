@@ -16,6 +16,15 @@ const MAX_CONTENT = 5 * 1024 * 1024
 const json = (data, status = 200, headers = {}) =>
   new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...headers } })
 
+// อ่านรหัสผ่าน admin — ยอมรับชื่อที่พิมพ์ต่างเล็กน้อย เช่น admin_password, "ADMIN_PASSWORD " , ADMIN-PASSWORD
+function adminPassword(env) {
+  if (typeof env.ADMIN_PASSWORD === 'string' && env.ADMIN_PASSWORD.trim()) return env.ADMIN_PASSWORD.trim()
+  for (const [k, v] of Object.entries(env)) {
+    if (typeof v === 'string' && /^admin[\s_-]*password$/i.test(k.trim()) && v.trim()) return v.trim()
+  }
+  return ''
+}
+
 // ---------- session ----------
 const enc = new TextEncoder()
 async function hmac(secret, msg) {
@@ -34,12 +43,12 @@ function readCookie(req, name) {
   return m ? m[1] : null
 }
 async function isAdmin(req, env) {
-  if (!env.ADMIN_PASSWORD) return false
+  if (!adminPassword(env)) return false
   const tok = readCookie(req, COOKIE)
   if (!tok) return false
   const [exp, sig] = tok.split('.')
   if (!exp || !sig || Number(exp) < Date.now()) return false
-  return safeEqual(sig, await hmac(String(env.ADMIN_PASSWORD).trim(), exp))
+  return safeEqual(sig, await hmac(adminPassword(env), exp))
 }
 function sessionCookies(value, maxAge) {
   const h = new Headers()
@@ -116,14 +125,14 @@ export default {
       }
 
       if (pathname === '/api/login' && method === 'POST') {
-        if (!env.ADMIN_PASSWORD) return json({ error: 'ยังไม่ได้ตั้งรหัสผ่าน admin (ADMIN_PASSWORD) ใน Cloudflare' }, 503)
+        if (!adminPassword(env)) return json({ error: 'ยังไม่ได้ตั้งรหัสผ่าน admin (ADMIN_PASSWORD) ใน Cloudflare' }, 503)
         const { password } = await req.json().catch(() => ({}))
-        if (typeof password !== 'string' || !safeEqual(password.trim(), String(env.ADMIN_PASSWORD).trim())) {
+        if (typeof password !== 'string' || !safeEqual(password.trim(), adminPassword(env))) {
           await new Promise((r) => setTimeout(r, 800))
           return json({ error: 'รหัสผ่านไม่ถูกต้อง' }, 401)
         }
         const exp = String(Date.now() + SESSION_DAYS * 864e5)
-        const tok = `${exp}.${await hmac(String(env.ADMIN_PASSWORD).trim(), exp)}`
+        const tok = `${exp}.${await hmac(adminPassword(env), exp)}`
         const h = sessionCookies(tok, SESSION_DAYS * 86400)
         h.set('content-type', 'application/json')
         h.set('cache-control', 'no-store')
@@ -135,7 +144,7 @@ export default {
       }
       if (pathname === '/api/me') {
         // สถานะระบบสำหรับหน้าล็อกอิน (บอกแค่ว่ามี/ไม่มี ไม่เปิดเผยค่าจริง)
-        return json({ admin: await isAdmin(req, env), configured: !!String(env.ADMIN_PASSWORD || '').trim(), storage: !!env.SITE })
+        return json({ admin: await isAdmin(req, env), configured: !!adminPassword(env), storage: !!env.SITE })
       }
       if (!env.SITE) return json({ error: 'ยังไม่มีที่เก็บข้อมูล (KV binding SITE) — ดูวิธีแก้ใน README' }, 503)
       if (pathname === '/api/content' && method === 'GET') return json(mergeContent(await getStored(env)))
