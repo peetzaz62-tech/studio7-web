@@ -7,15 +7,15 @@ export const CATEGORIES = [
 ]
 
 export const SECTIONS = [
-  { id: 'events', label: 'หน้าแรก (Events)', icon: '◷', view: '/', desc: 'ส่วนหัว ตารางกิจกรรม รูป Workshop วิดีโอ และเอกสารอ้างอิงบนหน้าแรก',
+  { id: 'events', label: 'หน้าแรก (Events)', view: '/', desc: 'ส่วนหัว ตารางกิจกรรม รูป Workshop วิดีโอ และเอกสารอ้างอิงบนหน้าแรก',
     keys: ['HERO', 'EVENTS', 'SUBMISSION_FORM', 'GALLERY', 'LECTURE_LINKS', 'VIDEOS', 'REFERENCE_DOCS', 'REFERENCE_LINKS', 'FLOATING'] },
-  { id: 'about', label: 'About us', icon: '◎', view: '/about-us', desc: 'แนวคิด หลักการ และเป้าหมายของสตูดิโอ', keys: ['ABOUT'] },
-  { id: 'projects', label: 'Projects', icon: '▦', map: 'PROJECTS', view: (k) => `/projects/${k}`, desc: 'หน้าผลงานแต่ละปี: บทนำ ผู้เข้าร่วม Workshop และรายการ Thesis' },
-  { id: 'thesis', label: 'Thesis', icon: '▤', map: 'THESIS', view: (k) => `/thesis/${k}`, desc: 'หน้ารายละเอียดผลงานของนักศึกษาแต่ละคน' },
-  { id: 'submission', label: 'Submission', icon: '↥', view: '/submission', desc: 'ลิงก์ฟอร์มส่งงานของนักศึกษา', keys: ['SUBMISSION'] },
-  { id: 'alumni', label: 'Alumni', icon: '◍', view: '/alumni', desc: 'รายชื่อศิษย์เก่าแต่ละรุ่น อาจารย์ และแขกรับเชิญ', keys: ['ALUMNI'] },
-  { id: 'download', label: 'Download', icon: '↧', view: '/download', desc: 'หนังสือและไฟล์ให้ดาวน์โหลด', keys: ['DOWNLOADS'] },
-  { id: 'site', label: 'เมนูและ Footer', icon: '☰', view: '/', desc: 'เมนูด้านบนของทุกหน้า และข้อมูลติดต่อท้ายเว็บ', keys: ['NAV', 'FOOTER'] },
+  { id: 'about', label: 'About us', view: '/about-us', desc: 'แนวคิด หลักการ และเป้าหมายของสตูดิโอ', keys: ['ABOUT'] },
+  { id: 'projects', label: 'Projects', map: 'PROJECTS', view: (k) => `/projects/${k}`, desc: 'หน้าผลงานแต่ละปี: บทนำ ผู้เข้าร่วม Workshop และรายการ Thesis' },
+  { id: 'thesis', label: 'Thesis', map: 'THESIS', view: (k) => `/thesis/${k}`, desc: 'หน้ารายละเอียดผลงานของนักศึกษาแต่ละคน' },
+  { id: 'submission', label: 'Submission', view: '/submission', desc: 'ลิงก์ฟอร์มส่งงานของนักศึกษา', keys: ['SUBMISSION'] },
+  { id: 'alumni', label: 'Alumni', view: '/alumni', desc: 'รายชื่อศิษย์เก่าแต่ละรุ่น อาจารย์ และแขกรับเชิญ', keys: ['ALUMNI'] },
+  { id: 'download', label: 'Download', view: '/download', desc: 'หนังสือและไฟล์ให้ดาวน์โหลด', keys: ['DOWNLOADS'] },
+  { id: 'site', label: 'เมนูและ Footer', view: '/', desc: 'เมนูด้านบนของทุกหน้า และข้อมูลติดต่อท้ายเว็บ', keys: ['NAV', 'FOOTER'] },
 ]
 
 // คำอธิบายใต้หัวข้อแต่ละการ์ด — บอกว่าแก้แล้วไปเปลี่ยนตรงไหนของเว็บ
@@ -23,7 +23,7 @@ export const KEY_DESC = {
   HERO: 'ข้อความใหญ่และรูปพื้นหลังด้านบนสุดของหน้าแรก',
   EVENTS: 'กิจกรรมเรียงตามวันที่อัตโนมัติ กิจกรรมที่เลยวันแล้วจะย้ายไป "กิจกรรมที่ผ่านมา" เอง',
   SUBMISSION_FORM: 'ปุ่ม Submission บนส่วนหัวหน้าแรก',
-  GALLERY: 'รูปในส่วน "บรรยากาศ Workshop" — ลากเรียงด้วยลูกศร อัปโหลดได้หลายรูปพร้อมกัน',
+  GALLERY: 'รูปในส่วน "บรรยากาศ Workshop" เรียงด้วยลูกศร อัปโหลดได้หลายรูปพร้อมกัน',
   LECTURE_LINKS: 'รายการลิงก์วิดีโอ Special lecture',
   VIDEOS: 'วิดีโอ YouTube ที่ฝังในหน้าแรก',
   REFERENCE_DOCS: 'การ์ดเอกสารอ้างอิงที่มีรูปปก',

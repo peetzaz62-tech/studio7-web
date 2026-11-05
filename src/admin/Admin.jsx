@@ -44,8 +44,8 @@ function Login({ onDone, configured, storage, unreachable }) {
         <form className="ad-login-card" onSubmit={submit}>
           <Logo className="ad-login-logo" />
           <p className="ad-eyebrow">Resilient Architecture · Studio 7</p>
-          <h1>เข้าสู่ระบบผู้ดูแล</h1>
-          <p className="ad-login-sub">สำหรับแก้ไขเนื้อหาเว็บไซต์ เช่น กิจกรรม ผลงาน และรูปภาพ</p>
+          <h1>เข้าสู่ระบบ</h1>
+          
           {!configured && !unreachable && (
             <p className="ad-warn">ยังไม่ได้ตั้งรหัสผ่าน admin — ใน Cloudflare → rmuttstudio7-web → Settings → Variables and Secrets เพิ่ม <code>ADMIN_PASSWORD</code> แบบ <b>Secret</b> แล้วกด <b>Deploy</b></p>
           )}
@@ -55,7 +55,7 @@ function Login({ onDone, configured, storage, unreachable }) {
             <button type="button" className="ad-pw-toggle" onClick={() => setShow((s) => !s)} aria-pressed={show}>{show ? 'ซ่อน' : 'แสดง'}</button>
           </div>
           {err && <p className="ad-err" role="alert">{err}</p>}
-          <button className="ad-btn ad-primary ad-block" disabled={busy || !pw}>{busy ? 'กำลังตรวจสอบ…' : 'เข้าสู่ระบบ →'}</button>
+          <button className="ad-btn ad-primary ad-block" disabled={busy || !pw}>{busy ? 'กำลังตรวจสอบ…' : 'เข้าสู่ระบบ'}</button>
           <div className="ad-login-foot">
             <a href="/">← กลับไปหน้าเว็บ</a>
             <span className="ad-status" aria-label="สถานะระบบ">
@@ -83,7 +83,7 @@ function History({ onRestore, onClose }) {
           <h2 id="ad-hist-title">ประวัติการบันทึก</h2>
           <button className="ad-btn ad-ghost" onClick={onClose}>ปิด</button>
         </div>
-        <p className="ad-hint">เก็บ 30 ครั้งล่าสุด — กู้คืนแล้วเว็บจะกลับเป็นเวอร์ชันนั้นทันที และการกู้คืนก็ถูกเก็บเป็นประวัติด้วย จึงย้อนกลับได้เสมอ</p>
+        <p className="ad-hint">30 ครั้งล่าสุด การกู้คืนจะถูกบันทึกเป็นเวอร์ชันใหม่ จึงย้อนกลับได้</p>
         {err && <p className="ad-err">{err}</p>}
         {!list && !err && <p className="ad-hint">กำลังโหลด…</p>}
         {list && !list.length && <p className="ad-empty">ยังไม่มีประวัติ — ระบบจะเริ่มเก็บเมื่อบันทึกครั้งแรก</p>}
@@ -177,62 +177,74 @@ function GroupedEntry({ map, value, all, onChange }) {
 }
 
 /* --------------------------------------------------------------- overview */
+// ทะเบียนหน้าเว็บ (แบบ drawing list): แต่ละแถวคือหนึ่งหน้า บอกเนื้อหาในหน้าและสถานะการแก้ไข
 function Overview({ content, go, onHistory }) {
   const [last, setLast] = useState(null)
   useEffect(() => { api('/api/history').then((l) => setLast(l[0] || false)).catch(() => setLast(false)) }, [])
   const today = new Date().toISOString().slice(0, 10)
-  const upcoming = content.EVENTS.filter((e) => (e.endDate || e.date) >= today).sort((a, b) => a.date.localeCompare(b.date))
-  const thesisCount = Object.keys(content.THESIS).length
-  const stats = [
-    { n: upcoming.length, l: 'กิจกรรมที่กำลังจะมาถึง', go: () => go('events', 'EVENTS') },
-    { n: thesisCount, l: 'หน้า Thesis', go: () => go('thesis') },
-    { n: Object.keys(content.PROJECTS).length, l: 'ปีของ Projects', go: () => go('projects') },
-    { n: content.GALLERY.length, l: 'รูป Workshop หน้าแรก', go: () => go('events', 'GALLERY') },
-  ]
-  const tasks = [
-    { t: 'เพิ่มหรือแก้กิจกรรม', d: 'วันที่ เวลา ลิงก์ Google Meet', go: () => go('events', 'EVENTS') },
-    { t: 'อัปโหลดรูป Workshop', d: 'เลือกได้หลายรูป ระบบย่อขนาดให้', go: () => go('events', 'GALLERY') },
-    { t: 'เพิ่ม Thesis ใหม่', d: 'สร้างหน้าผลงานของนักศึกษา', go: () => go('thesis') },
-    { t: 'แก้รายชื่อผู้เข้าร่วม', d: 'รูปและชื่อในหน้า Projects', go: () => go('projects') },
-    { t: 'แก้ข้อความส่วนหัวหน้าแรก', d: 'หัวข้อ ภาคเรียน รูปพื้นหลัง', go: () => go('events', 'HERO') },
-    { t: 'แก้อีเมลและที่อยู่', d: 'ข้อมูลท้ายเว็บ', go: () => go('site', 'FOOTER') },
-  ]
+  const upcoming = content.EVENTS.filter((e) => e.date && (e.endDate || e.date) >= today).sort((a, b) => a.date.localeCompare(b.date))
+  const edited = (keys) => keys.some((k) => JSON.stringify(content[k]) !== JSON.stringify(DEFAULT_CONTENT[k]))
+  const rows = [
+    { id: 'events', no: 'A-01', info: `${upcoming.length} กิจกรรมที่จะถึง · ${content.GALLERY.length} รูป Workshop · ${content.VIDEOS.length} วิดีโอ` },
+    { id: 'about', no: 'A-02', info: `${content.ABOUT.principles.length} หลักการ · ${content.ABOUT.aims.length} เป้าหมาย` },
+    { id: 'submission', no: 'A-03', info: `${content.SUBMISSION.items.length} ฟอร์มส่งงาน` },
+    { id: 'alumni', no: 'A-04', info: `${content.ALUMNI.generations.length} รุ่น · ${content.ALUMNI.tutors.length} อาจารย์` },
+    { id: 'download', no: 'A-05', info: `${content.DOWNLOADS.length} เล่ม` },
+    { id: 'projects', no: 'B-01', info: `ปี ${Object.keys(content.PROJECTS).join(', ')}`, keys: ['PROJECTS'] },
+    { id: 'thesis', no: 'B-02', info: `${Object.keys(content.THESIS).length} หน้า`, keys: ['THESIS'] },
+    { id: 'site', no: 'C-01', info: `${content.NAV.length} เมนู · ${content.FOOTER.email}` },
+  ].map((r) => ({ ...r, s: sectionById(r.id), edited: edited(r.keys || sectionById(r.id).keys) }))
+
   return (
     <>
       <header className="ad-page-head">
-        <p className="ad-eyebrow">ภาพรวม</p>
-        <h1>สวัสดี 👋 วันนี้อยากแก้อะไร</h1>
+        <p className="ad-crumbs"><span>ภาพรวม</span></p>
+        <div className="ad-page-title">
+          <h1>รายการหน้าเว็บ</h1>
+          <div className="ad-row">
+            <button className="ad-btn ad-small" onClick={() => go('events', 'EVENTS')}>＋ กิจกรรม</button>
+            <button className="ad-btn ad-small" onClick={() => go('events', 'GALLERY')}>＋ รูป Workshop</button>
+            <button className="ad-btn ad-small" onClick={() => go('thesis')}>＋ Thesis</button>
+          </div>
+        </div>
         <p className="ad-page-desc">
-          {last === null ? 'กำลังโหลด…' : last ? <>บันทึกล่าสุด {fmtTime(last.at || last.key.slice(8))}{last.note && <> · “{last.note}”</>} · <button className="ad-link" onClick={onHistory}>ดูประวัติ</button></> : 'ยังไม่เคยบันทึกจาก dashboard — ตอนนี้เว็บใช้เนื้อหาตั้งต้นทั้งหมด'}
+          {last === null ? 'กำลังโหลด…' : last
+            ? <>บันทึกล่าสุด {fmtTime(last.at || last.key.slice(8))}{last.note && <> — {last.note}</>} · <button className="ad-link" onClick={onHistory}>ประวัติ</button></>
+            : 'ยังไม่มีการบันทึกจาก dashboard'}
         </p>
       </header>
-      <div className="ad-stats">
-        {stats.map((s) => (
-          <button key={s.l} className="ad-stat" onClick={s.go}><b>{s.n}</b><span>{s.l}</span></button>
-        ))}
-      </div>
-      {upcoming[0] && (
-        <div className="ad-next">
-          <span className="ad-eyebrow">กิจกรรมถัดไป</span>
-          <strong>{upcoming[0].title}</strong>
-          <span>{upcoming[0].date}{upcoming[0].time ? ` · ${upcoming[0].time} น.` : ''} · {upcoming[0].tag}</span>
-        </div>
+
+      <table className="ad-register">
+        <thead>
+          <tr><th scope="col">เลขที่</th><th scope="col">หน้า</th><th scope="col">เนื้อหา</th><th scope="col">สถานะ</th></tr>
+        </thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr key={r.id} onClick={() => go(r.id)}>
+              <td className="ad-reg-no">{r.no}</td>
+              <th scope="row"><button type="button" onClick={(e) => { e.stopPropagation(); go(r.id) }}>{r.s.label}</button></th>
+              <td className="ad-reg-info">{r.info}</td>
+              <td>{r.edited ? <span className="ad-badge">แก้ไขแล้ว</span> : <span className="ad-reg-default">ค่าตั้งต้น</span>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      {upcoming.length > 0 && (
+        <section className="ad-upcoming">
+          <h2 className="ad-h2">กิจกรรมที่จะถึง</h2>
+          <ol>
+            {upcoming.slice(0, 4).map((e) => (
+              <li key={e.id || e.date + e.title}>
+                <span className="ad-up-date">{e.date.split('-').reverse().join('.')}</span>
+                <span className="ad-up-title">{e.title}</span>
+                <span className="ad-up-tag">{e.tag}</span>
+              </li>
+            ))}
+          </ol>
+          <button className="ad-link" onClick={() => go('events', 'EVENTS')}>แก้ตารางกิจกรรม</button>
+        </section>
       )}
-      <h2 className="ad-h2">งานที่ทำบ่อย</h2>
-      <div className="ad-tasks">
-        {tasks.map((t) => (
-          <button key={t.t} className="ad-task" onClick={t.go}><strong>{t.t}</strong><span>{t.d}</span><i aria-hidden="true">→</i></button>
-        ))}
-      </div>
-      <div className="ad-tips">
-        <h2 className="ad-h2">วิธีใช้</h2>
-        <ol>
-          <li>เลือกหน้าจากเมนูซ้าย แล้วกดเปิดหัวข้อที่ต้องการแก้</li>
-          <li>กด <b>ดูหน้าเว็บ</b> เพื่อดูผลก่อนบันทึก (คนอื่นยังไม่เห็น)</li>
-          <li>กด <b>บันทึก</b> หรือ Ctrl+S — ทุกคนเห็นภายใน 1 นาที</li>
-          <li>แก้ผิด? กด <b>ประวัติ</b> แล้วกู้คืนเวอร์ชันก่อนหน้า</li>
-        </ol>
-      </div>
     </>
   )
 }
@@ -284,7 +296,7 @@ export default function Admin() {
 
   const save = useCallback(async () => {
     setError(''); setStatus('')
-    const note = prompt('บันทึกสั้น ๆ ว่าแก้อะไร (ไม่ใส่ก็ได้) — ช่วยให้หาในประวัติง่ายขึ้น', '')
+    const note = prompt('หมายเหตุการแก้ไข (ไม่บังคับ)', '')
     if (note === null) return
     setSaving(true)
     try {
@@ -371,7 +383,7 @@ export default function Admin() {
       <div className="ad-body">
         {navOpen && <div className="ad-scrim" onClick={() => setNavOpen(false)} aria-hidden="true" />}
         <nav id="ad-side" className={`ad-side ${navOpen ? 'open' : ''}`} aria-label="ส่วนของเว็บ">
-          <button className={`ad-side-item ${sid === 'home' ? 'on' : ''}`} onClick={() => go('home')}><i aria-hidden="true">⌂</i>ภาพรวม</button>
+          <button className={`ad-side-item ${sid === 'home' ? 'on' : ''}`} onClick={() => go('home')}>ภาพรวม</button>
           {CATEGORIES.map((cat) => (
             <div className="ad-cat" key={cat.id}>
               <p className="ad-cat-label">{cat.label}</p>
@@ -381,7 +393,7 @@ export default function Admin() {
                 return (
                   <div key={id}>
                     <button className={`ad-side-item ${active ? 'on' : ''}`} onClick={() => go(id)}>
-                      <i aria-hidden="true">{s.icon}</i>{s.label}
+                      {s.label}
                       {s.map && <span className="ad-side-n">{Object.keys(content[s.map]).length}</span>}
                     </button>
                     {active && s.map === 'PROJECTS' && (
@@ -411,7 +423,7 @@ export default function Admin() {
               })}
             </div>
           ))}
-          <button className="ad-side-item ad-side-logout" onClick={logout}><i aria-hidden="true">⎋</i>ออกจากระบบ</button>
+          <button className="ad-side-item ad-side-logout" onClick={logout}>ออกจากระบบ</button>
         </nav>
 
         <main className="ad-main">
@@ -445,7 +457,7 @@ export default function Admin() {
                 {section.map
                   ? (entry && content[section.map][entry]
                     ? <GroupedEntry map={section.map} value={content[section.map][entry]} all={content[section.map]} onChange={setEntryValue} />
-                    : <p className="ad-empty">เลือกรายการจากเมนูด้านซ้าย หรือกด “＋ เพิ่ม” เพื่อสร้างใหม่</p>)
+                    : <p className="ad-empty">เลือกรายการจากเมนูด้านซ้าย</p>)
                   : section.keys.map((k, i) => (
                     <Panel key={k} id={`ad-k-${k}`} title={KEY_TITLES[k] || k} desc={KEY_DESC[k]} count={countOf(content[k])}
                       changed={JSON.stringify(content[k]) !== JSON.stringify(DEFAULT_CONTENT[k])} onReset={() => resetKey(k)}
@@ -461,10 +473,10 @@ export default function Admin() {
 
       {dirty && (
         <div className="ad-savebar" role="region" aria-label="การแก้ไขที่ยังไม่บันทึก">
-          <span><b>มีการแก้ไขที่ยังไม่บันทึก</b> · กด “ดูหน้าเว็บ” เพื่อตรวจก่อนได้</span>
+          <span>มีการแก้ไขที่ยังไม่บันทึก</span>
           <div className="ad-row">
             <button className="ad-btn ad-ghost ad-small" onClick={discard}>ยกเลิกการแก้ไข</button>
-            <button className="ad-btn ad-primary ad-small" disabled={saving} onClick={save}>{saving ? 'กำลังบันทึก…' : 'บันทึก (Ctrl+S)'}</button>
+            <button className="ad-btn ad-primary ad-small" disabled={saving} onClick={save}>{saving ? 'กำลังบันทึก…' : 'บันทึก'}</button>
           </div>
         </div>
       )}
