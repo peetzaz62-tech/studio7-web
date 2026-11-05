@@ -1,6 +1,6 @@
 // Cloudflare Workers (static assets) — ใช้คู่กับ Deploy command: npx wrangler deploy
 {
-  "name": "studio7-web",
+  "name": "rmuttstudio7-web",
   "compatibility_date": "2025-09-01",
   "assets": {
     "directory": "./dist",
