@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useContent } from '../content.jsx'
+import SectionHead from './SectionHead.jsx'
 
 // แผนที่โลก: ปักหมุดที่ตั้งโครงการ Thesis ทุกชิ้น (โหลดข้อมูลแผนที่แยกไฟล์เมื่อเลื่อนมาถึง)
 const W = 960
@@ -22,7 +23,7 @@ function useWorld() {
   return geo
 }
 
-export default function ThesisMap({ year, title = 'Thesis around the world' }) {
+export default function ThesisMap({ year, title = 'Thesis around the world', no }) {
   const { THESIS, PROJECTS } = useContent()
   const geo = useWorld()
   const [hover, setHover] = useState(null)
@@ -53,12 +54,9 @@ export default function ThesisMap({ year, title = 'Thesis around the world' }) {
   return (
     <section className="section map-band" aria-labelledby="map-title">
       <div className="wrap">
-        <header className="section-head">
-          <span className="kicker">Locations</span>
-          <h2 id="map-title">{title}</h2>
-          <p className="section-lead">{items.length} โครงการ · {new Set(items.map((i) => i.location.place.split(',').pop().trim())).size} ประเทศ</p>
-        </header>
-        <div className="map-frame">
+        <SectionHead no={no} kicker="Locations" title={<span id="map-title">{title}</span>}
+          lead={`${items.length} โครงการ · ${new Set(items.map((i) => i.location.place.split(',').pop().trim())).size} ประเทศ — ชี้หรือแตะหมุดเพื่อดูชื่อโครงการ`} />
+        <div className="map-frame" data-reveal>
           <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`แผนที่ที่ตั้งโครงการ ${items.length} แห่ง`}>
             {geo ? (
               <>
@@ -83,7 +81,7 @@ export default function ThesisMap({ year, title = 'Thesis around the world' }) {
             </div>
           )}
         </div>
-        <ul className="map-list">
+        <ul className="map-list" data-reveal>
           {years.map((y) => (
             <li key={y}>
               <span className="map-year"><i style={{ background: ACCENT[PROJECTS[y]?.accent] || ACCENT.cyan }} />Thesis {y}</span>

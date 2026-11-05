@@ -11,7 +11,9 @@ Live: https://rmuttstudio7-web.peetzaz.workers.dev — Worker `rmuttstudio7-web`
 - **Admin UI** (`src/admin/`, lazy chunk): schema-driven generic editor (`Editor.jsx`) — field type inferred from key names/values in `schema.js` (images, image lists, dates, colors, long text, links, pair lists, object lists). Add Thai labels in `LABELS` when adding new fields. Draft edits live in the content context, so "ดูหน้าเว็บ" previews unsaved changes.
 - **Images**: `public/img/<name>.webp` + `<name>-sm.webp`; data keeps legacy `name.jpg` names, mapped by `imgUrl`/`thumbUrl` in `src/media.js`. Use `thumbUrl` in grids, `imgUrl` for lightbox/hero.
 - **Features**: `ThesisMap` (d3-geo + world-atlas, lazy; pins from `THESIS[*].location`), `Countdown` + `calendar.js` (Google Calendar/.ics, Asia/Bangkok UTC+7), `WaterGauge` (scroll progress as water level).
-- Styling: `src/styles.css` (site) and `src/admin/admin.css`; color tokens on `:root` with dark-mode overrides. Neon marker tags `.tag-*` mirror the original site.
+- **Loader**: `index.html` contains an inline `#boot` intro (vector logo from `src/logo.js`: outline draws, water fills, wipes up) that runs before JS; `src/boot.js` removes it when fonts + hero image are ready and adds `html.booted`. `RouteLoader` shows a small logo loader on page changes only if above-the-fold images take >180ms.
+- **Motion**: add `data-reveal` (+ optional `style={{'--d': n}}` stagger) to reveal on scroll (`hooks/useReveal.js`); `.hero-in` and `SplitTitle` animate on mount after `html.booted`. All motion is disabled under `prefers-reduced-motion`.
+- Styling: `src/styles.css` (site) and `src/admin/admin.css`; color tokens on `:root` with dark-mode overrides. Each page sets an accent via `.accent-<color>` → `--accent` (used for lines/fills, never text on white). Fonts: Archivo (display), IBM Plex Sans Thai (body), IBM Plex Mono (labels). Don't name classes `split` (layout grid) for anything else.
 
 ## Local dev
 `cp .dev.vars.example .dev.vars` then `npm run dev:worker` (wrangler dev on :8787 with local KV).

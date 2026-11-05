@@ -16,16 +16,20 @@ export default function Countdown({ events }) {
   const days = Math.floor(ms / 864e5)
   const hours = Math.floor((ms % 864e5) / 36e5)
   const mins = Math.floor((ms % 36e5) / 6e4)
+  const units = [[days, 'วัน'], [String(hours).padStart(2, '0'), 'ชั่วโมง'], [String(mins).padStart(2, '0'), 'นาที']]
   return (
     <a className="countdown" href="#schedule" onClick={(e) => { e.preventDefault(); document.getElementById('schedule')?.scrollIntoView({ behavior: 'smooth' }) }}>
+      <span className="cd-label mono">{live ? 'Now' : 'Next event'}</span>
       {live ? (
         <span className="cd-live">● กำลังจัดอยู่ตอนนี้</span>
       ) : (
         <span className="cd-nums" aria-label={`อีก ${days} วัน ${hours} ชั่วโมง ${mins} นาที`}>
-          <b>{days}</b><small>วัน</small><b>{String(hours).padStart(2, '0')}</b><small>ชม.</small><b>{String(mins).padStart(2, '0')}</b><small>นาที</small>
+          {units.map(([v, l]) => (
+            <span className="cd-unit" key={l}><b key={v}>{v}</b><small>{l}</small></span>
+          ))}
         </span>
       )}
-      <span className="cd-what">{live ? '' : 'ถึง '}<strong>{target.e.tag || target.e.title}</strong> · {target.e.title}</span>
+      <span className="cd-what"><strong>{target.e.tag || target.e.title}</strong><span>{target.e.title}</span></span>
     </a>
   )
 }

@@ -4,23 +4,23 @@ import { useContent } from '../content.jsx'
 export default function Submission() {
   const { SUBMISSION } = useContent()
   return (
-    <>
+    <div className="accent-red">
       <PageHero kicker="Submission" title="Project submission" accent="red" />
       <section className="section wrap">
-        <p className="lead-text">{SUBMISSION.intro}</p>
+        <p className="lead-text" data-reveal>{SUBMISSION.intro}</p>
         <div className="submit-list">
-          {SUBMISSION.items.map((s) => (
-            <article key={s.no} className="submit-card">
+          {SUBMISSION.items.map((s, i) => (
+            <a key={s.no + s.title} className="submit-card" href={s.href} target="_blank" rel="noreferrer" data-reveal style={{ '--d': i }}>
               <span className="submit-no">{s.no}</span>
-              <div className="submit-body">
-                <h2>{s.title}</h2>
-                <p><strong>{s.label}</strong> · {s.note}</p>
-              </div>
-              <a className="btn btn-solid" href={s.href} target="_blank" rel="noreferrer">Upload Now! ↗</a>
-            </article>
+              <span className="submit-body">
+                <strong>{s.title}</strong>
+                <span><b>{s.label}</b> · {s.note}</span>
+              </span>
+              <span className="btn btn-dark">Upload Now <i>↗</i></span>
+            </a>
           ))}
         </div>
       </section>
-    </>
+    </div>
   )
 }
