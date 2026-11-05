@@ -18,6 +18,8 @@ function Header({ path, overHero }) {
   const { NAV } = useContent()
   const [open, setOpen] = useState(false)
   const [solid, setSolid] = useState(false)
+  const [admin, setAdmin] = useState(false)
+  useEffect(() => { setAdmin(isAdminHint()) }, [path])
 
   useEffect(() => { setOpen(false) }, [path])
   useEffect(() => {
@@ -56,6 +58,9 @@ function Header({ path, overHero }) {
               <NavItem key={item.path} item={item} path={path} />
             )
           )}
+          <a href="/admin" className={`nav-link nav-login ${admin ? 'is-admin' : ''}`}>
+            {admin ? '✎ Dashboard' : 'เข้าสู่ระบบ'}
+          </a>
         </nav>
       </div>
     </header>

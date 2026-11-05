@@ -585,3 +585,13 @@ a.person:hover img { transform: scale(1.05); }
 .edit-fab:hover { background: var(--ink); color: var(--paper); }
 .edit-fab.is-dirty { background: #b45309; border-radius: 14px; }
 .edit-fab small { font-weight: 400; font-size: .75rem; }
+
+/* login button in main menu */
+.nav-link.nav-login {
+  margin-left: 10px; padding: 6px 14px; border: 1px solid currentColor; border-radius: 99px; font-size: .88rem;
+}
+.nav-link.nav-login:hover { border-color: var(--hl-cyan); color: var(--hl-cyan); }
+.nav-link.nav-login.is-admin { background: var(--hl-cyan); border-color: var(--hl-cyan); color: #000; }
+@media (max-width: 860px) {
+  .nav-link.nav-login { margin: 18px 0 0; text-align: center; padding: 12px; border: 1px solid #444; border-radius: 99px; }
+}
