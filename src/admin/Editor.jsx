@@ -225,7 +225,7 @@ export function Field({ k, value, onChange, onRemove, top }) {
 
   const group = Array.isArray(value) || (value && typeof value === 'object')
   return (
-    <div className={`ad-field ${group ? 'ad-group' : ''} ${top ? 'ad-root' : ''}`}>
+    <div className={`ad-field ${group ? 'ad-group' : ''} ${top ? 'ad-topfield' : ''}`}>
       <div className="ad-label-row">
         {group ? <span className="ad-label">{label(k)}</span> : <label className="ad-label" htmlFor={id}>{label(k)}</label>}
         {onRemove && <button type="button" className="ad-link" onClick={onRemove}>ลบช่องนี้</button>}

@@ -1,14 +1,57 @@
 // โครงของ dashboard: เมนูด้านซ้าย, ชื่อช่องภาษาไทย, และกฎว่าช่องไหนเป็นรูป/วันที่/สี/ข้อความยาว
-export const SECTIONS = [
-  { id: 'events', label: 'หน้า Events', view: '/', keys: ['HERO', 'EVENTS', 'SUBMISSION_FORM', 'LECTURE_LINKS', 'VIDEOS', 'GALLERY', 'REFERENCE_DOCS', 'REFERENCE_LINKS', 'FLOATING'] },
-  { id: 'about', label: 'About us', view: '/about-us', keys: ['ABOUT'] },
-  { id: 'projects', label: 'Projects', map: 'PROJECTS', view: (k) => `/projects/${k}` },
-  { id: 'thesis', label: 'Thesis', map: 'THESIS', view: (k) => `/thesis/${k}` },
-  { id: 'submission', label: 'Submission', view: '/submission', keys: ['SUBMISSION'] },
-  { id: 'alumni', label: 'Alumni', view: '/alumni', keys: ['ALUMNI'] },
-  { id: 'download', label: 'Download', view: '/download', keys: ['DOWNLOADS'] },
-  { id: 'site', label: 'เมนูและ Footer', view: '/', keys: ['NAV', 'FOOTER'] },
+// เมนูด้านซ้าย แบ่งเป็นหมวด
+export const CATEGORIES = [
+  { id: 'pages', label: 'หน้าเว็บ', items: ['events', 'about', 'submission', 'alumni', 'download'] },
+  { id: 'work', label: 'ผลงาน', items: ['projects', 'thesis'] },
+  { id: 'settings', label: 'ตั้งค่าเว็บ', items: ['site'] },
 ]
+
+export const SECTIONS = [
+  { id: 'events', label: 'หน้าแรก (Events)', icon: '◷', view: '/', desc: 'ส่วนหัว ตารางกิจกรรม รูป Workshop วิดีโอ และเอกสารอ้างอิงบนหน้าแรก',
+    keys: ['HERO', 'EVENTS', 'SUBMISSION_FORM', 'GALLERY', 'LECTURE_LINKS', 'VIDEOS', 'REFERENCE_DOCS', 'REFERENCE_LINKS', 'FLOATING'] },
+  { id: 'about', label: 'About us', icon: '◎', view: '/about-us', desc: 'แนวคิด หลักการ และเป้าหมายของสตูดิโอ', keys: ['ABOUT'] },
+  { id: 'projects', label: 'Projects', icon: '▦', map: 'PROJECTS', view: (k) => `/projects/${k}`, desc: 'หน้าผลงานแต่ละปี: บทนำ ผู้เข้าร่วม Workshop และรายการ Thesis' },
+  { id: 'thesis', label: 'Thesis', icon: '▤', map: 'THESIS', view: (k) => `/thesis/${k}`, desc: 'หน้ารายละเอียดผลงานของนักศึกษาแต่ละคน' },
+  { id: 'submission', label: 'Submission', icon: '↥', view: '/submission', desc: 'ลิงก์ฟอร์มส่งงานของนักศึกษา', keys: ['SUBMISSION'] },
+  { id: 'alumni', label: 'Alumni', icon: '◍', view: '/alumni', desc: 'รายชื่อศิษย์เก่าแต่ละรุ่น อาจารย์ และแขกรับเชิญ', keys: ['ALUMNI'] },
+  { id: 'download', label: 'Download', icon: '↧', view: '/download', desc: 'หนังสือและไฟล์ให้ดาวน์โหลด', keys: ['DOWNLOADS'] },
+  { id: 'site', label: 'เมนูและ Footer', icon: '☰', view: '/', desc: 'เมนูด้านบนของทุกหน้า และข้อมูลติดต่อท้ายเว็บ', keys: ['NAV', 'FOOTER'] },
+]
+
+// คำอธิบายใต้หัวข้อแต่ละการ์ด — บอกว่าแก้แล้วไปเปลี่ยนตรงไหนของเว็บ
+export const KEY_DESC = {
+  HERO: 'ข้อความใหญ่และรูปพื้นหลังด้านบนสุดของหน้าแรก',
+  EVENTS: 'กิจกรรมเรียงตามวันที่อัตโนมัติ กิจกรรมที่เลยวันแล้วจะย้ายไป "กิจกรรมที่ผ่านมา" เอง',
+  SUBMISSION_FORM: 'ปุ่ม Submission บนส่วนหัวหน้าแรก',
+  GALLERY: 'รูปในส่วน "บรรยากาศ Workshop" — ลากเรียงด้วยลูกศร อัปโหลดได้หลายรูปพร้อมกัน',
+  LECTURE_LINKS: 'รายการลิงก์วิดีโอ Special lecture',
+  VIDEOS: 'วิดีโอ YouTube ที่ฝังในหน้าแรก',
+  REFERENCE_DOCS: 'การ์ดเอกสารอ้างอิงที่มีรูปปก',
+  REFERENCE_LINKS: 'ลิงก์อ้างอิงแบบข้อความ',
+  FLOATING: 'ส่วน Floating Futures ท้ายหน้าแรก',
+  ABOUT: 'ทุกส่วนของหน้า About us',
+  SUBMISSION: 'ข้อความแนะนำและปุ่มส่งงานแต่ละรุ่น',
+  ALUMNI: 'รายชื่อแต่ละรุ่น อาจารย์ และแขกรับเชิญ',
+  DOWNLOADS: 'หนังสือแต่ละเล่ม: ปก คำอธิบาย และลิงก์ดาวน์โหลด',
+  NAV: 'ชื่อและลิงก์ของเมนูด้านบน',
+  FOOTER: 'ที่อยู่ อีเมล และโลโก้ท้ายเว็บ',
+}
+
+// หน้า Projects / Thesis: แบ่งช่องเป็นกลุ่มให้หาง่าย (ช่องที่ไม่อยู่ในกลุ่มไหนจะไปอยู่ "อื่น ๆ")
+export const FIELD_GROUPS = {
+  PROJECTS: [
+    { label: 'ข้อมูลหลัก', desc: 'หัวข้อ สีประจำปี และบทนำ', keys: ['subtitle', 'accent', 'intro'] },
+    { label: 'ผู้เข้าร่วม', desc: 'รายชื่อและรูปนักศึกษา — ใส่ลิงก์ /thesis/... เพื่อให้กดไปหน้าผลงานได้', keys: ['people'] },
+    { label: 'Workshop & Fieldtrip', desc: 'หัวข้อ ข้อความ และรูปกิจกรรม', keys: ['workshop'] },
+    { label: 'Thesis', desc: 'การ์ดผลงานที่แสดงในหน้าปีนี้', keys: ['thesisTitle', 'thesis'] },
+  ],
+  THESIS: [
+    { label: 'ข้อมูลหลัก', desc: 'ชื่อโครงการ เจ้าของผลงาน ปี และตำแหน่งบนลูกโลก', keys: ['title', 'titleTh', 'by', 'year', 'location'] },
+    { label: 'เนื้อหา', desc: 'คำอธิบายโครงการ ข้อมูลสรุป และโซเชียล', keys: ['text', 'facts', 'note', 'social'] },
+    { label: 'รูปภาพ', desc: 'รูปเปิด หน้าพอร์ตโฟลิโอ บอร์ดนำเสนอ โมเดล และ Final', keys: ['hero', 'pages', 'chart', 'chartLabel', 'models', 'modelCaption', 'final', 'finalLabel'] },
+    { label: 'วิดีโอ', desc: 'วิดีโอ YouTube ของโครงการ', keys: ['video'] },
+  ],
+}
 
 export const KEY_TITLES = {
   HERO: 'ส่วนหัวหน้าแรก (Hero)', EVENTS: 'กิจกรรม (ตารางกิจกรรม)', SUBMISSION_FORM: 'ลิงก์ฟอร์มส่งงาน (ปุ่ม Submission บนหน้าแรก)',
