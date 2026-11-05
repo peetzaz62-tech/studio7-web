@@ -8,7 +8,8 @@ import Submission from './pages/Submission.jsx'
 import Alumni from './pages/Alumni.jsx'
 import Download from './pages/Download.jsx'
 import NotFound from './pages/NotFound.jsx'
-import { ContentProvider, useContent } from './content.jsx'
+import { ContentProvider, useContent, useContentState } from './content.jsx'
+import { usePreviewBridge } from './preview.js'
 import { usePath } from './router.js'
 import { parsePath } from './routes.js'
 import { metaFor } from './meta.js'
@@ -44,7 +45,8 @@ function Page({ r }) {
 
 function Site() {
   const path = usePath()
-  const content = useContent()
+  const { content, setContent } = useContentState()
+  usePreviewBridge(setContent)
   const r = parsePath(path, content)
   useEffect(() => { document.title = metaFor(r, content).title }, [path, content])
 

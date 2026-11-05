@@ -242,10 +242,9 @@
 
 /* ---------- save bar ---------- */
 .ad-savebar {
-  position: fixed; z-index: 40; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%);
+  position: sticky; z-index: 20; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); margin-top: 28px;
   display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 20px;
-  width: min(760px, calc(100% - 32px)); padding: 12px 14px 12px 20px; background: var(--ink); color: #fff;
-  font-size: .92rem;
+  padding: 12px 14px 12px 20px; background: var(--ink); color: #fff; font-size: .92rem;
 }
 .ad-savebar .ad-ghost { color: #fff; border-color: #555; }
 .ad-savebar .ad-primary { background: var(--hl-cyan); color: #000; border-color: var(--hl-cyan); }
@@ -296,3 +295,35 @@
 @media (max-width: 1000px) { .ad-scrim { display: block; position: fixed; inset: 0; z-index: 34; background: rgba(18, 18, 18, .35); animation: ad-rise .2s both; } }
 .ad-login-card h1 { margin-bottom: 14px; }
 .ad-register thead th { white-space: nowrap; }
+
+/* ---------- live preview ---------- */
+.ad-btn.is-on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.ad-body.has-preview { grid-template-columns: 250px minmax(0, 1fr) clamp(380px, 42vw, 820px); }
+.ad-body.has-preview .ad-main { padding-left: 24px; padding-right: 24px; }
+.ad-body.has-preview .ad-page { max-width: 760px; }
+.ad-preview {
+  position: sticky; top: 61px; height: calc(100vh - 61px); display: flex; flex-direction: column;
+  background: #e2e2dc; border-left: 1px solid var(--ink); min-width: 0;
+}
+.ad-pv-bar { display: flex; align-items: center; gap: 10px; padding: 8px 10px 8px 14px; background: var(--surface); border-bottom: 1px solid var(--line-2); }
+.ad-pv-path { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: var(--f-mono); font-size: .8rem; color: var(--ink-2); }
+.ad-seg { display: inline-flex; border: 1px solid var(--line-2); }
+.ad-seg button { font: inherit; font-size: .8rem; padding: 5px 12px; background: var(--surface); border: 0; cursor: pointer; color: var(--ink-2); }
+.ad-seg button + button { border-left: 1px solid var(--line-2); }
+.ad-seg button[aria-pressed="true"] { background: var(--ink); color: #fff; }
+.ad-pv-x { width: 32px; height: 32px; background: none; border: 1px solid var(--line-2); font-size: 1.1rem; cursor: pointer; }
+.ad-pv-stage { flex: 1; min-height: 0; overflow: hidden; display: flex; justify-content: center; align-items: flex-start; }
+.ad-pv-stage.is-mobile { padding: 16px; }
+.ad-pv-device { position: relative; overflow: hidden; background: #fff; flex: none; }
+.ad-pv-stage.is-mobile .ad-pv-device { border: 1px solid var(--ink); border-radius: 18px; }
+.ad-pv-device iframe { display: block; border: 0; transform-origin: 0 0; background: #fff; }
+.ad-pv-note { margin: 0; padding: 8px 14px; font-size: .8rem; color: var(--ink-2); background: var(--surface); border-top: 1px solid var(--line-2); }
+.ad-pv-note b { color: #1e6c93; }
+@media (max-width: 1199px) {
+  .ad-body.has-preview { grid-template-columns: 250px minmax(0, 1fr); }
+  .ad-preview { position: fixed; top: 61px; right: 0; bottom: 0; height: auto; width: min(560px, 100vw); z-index: 32; box-shadow: -12px 0 40px rgba(0, 0, 0, .18); }
+}
+@media (max-width: 1000px) {
+  .ad-body.has-preview { grid-template-columns: 1fr; }
+  .ad-preview { width: 100vw; top: 0; z-index: 45; padding-top: env(safe-area-inset-top, 0px); }
+}

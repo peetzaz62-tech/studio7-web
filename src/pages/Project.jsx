@@ -35,13 +35,13 @@ export default function Project({ year }) {
 
   return (
     <div className={`accent-${d.accent}`}>
-      <PageHero kicker={`Projects · ${year}`} big={year} subtitle={d.subtitle} accent={d.accent}>
+      <PageHero kicker={`Projects · ${year}`} big={year} subtitle={d.subtitle} accent={d.accent} edit="accent">
         <nav className="year-switch hero-in" style={{ '--d': 4 }} aria-label="เลือกปี">
           {years.map((y) => <a key={y} href={`/projects/${y}`} className={y === year ? 'on' : ''} aria-current={y === year ? 'page' : undefined}>{y}</a>)}
         </nav>
       </PageHero>
 
-      <section className="section wrap">
+      <section className="section wrap" data-edit="subtitle intro">
         <div className="split">
           <SectionHead no={no()} kicker={`Project ${year}`} title={d.subtitle} />
           <div className="prose" data-reveal style={{ '--d': 2 }}>{d.intro.map((p, i) => <p key={i}>{p}</p>)}</div>
@@ -49,7 +49,7 @@ export default function Project({ year }) {
       </section>
 
       {d.people.length > 0 && (
-        <section className="section band">
+        <section className="section band" data-edit="people">
           <div className="wrap">
             <SectionHead no={no()} kicker="Participants" title={`ผู้เข้าร่วม ${d.people.length} คน`} />
             <div className="people">{d.people.map((p, i) => <Person key={p.name} p={p} i={i} />)}</div>
@@ -58,7 +58,7 @@ export default function Project({ year }) {
       )}
 
       {w && (
-        <section className="section wrap">
+        <section className="section wrap" data-edit="workshop">
           <SectionHead no={no()} kicker="Workshop & Fieldtrip" title={w.title} lead={w.text} />
           {w.photos?.length > 0 && (
             <div className="trio">
@@ -86,7 +86,7 @@ export default function Project({ year }) {
         </section>
       )}
 
-      <section className="section band">
+      <section className="section band" data-edit="thesisTitle thesis">
         <div className="wrap">
           <SectionHead no={no()} kicker="Thesis" title={d.thesisTitle || 'Thesis Projects'} />
           {d.thesis.length ? (

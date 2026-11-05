@@ -82,7 +82,7 @@ function Hero({ HERO, EVENTS, SUBMISSION_FORM }) {
   const ref = useRef(null)
   useScrollVar(ref)
   return (
-    <section className="hero" ref={ref}>
+    <section className="hero" ref={ref} data-edit="HERO SUBMISSION_FORM">
       <div className="hero-bg" style={{ backgroundImage: `url(${img(HERO.image || 'hero-bg.jpg')})` }} />
       <div className="hero-grid" aria-hidden="true" />
       <div className="wrap hero-inner">
@@ -123,7 +123,7 @@ export default function Events() {
       <Hero HERO={HERO} EVENTS={EVENTS} SUBMISSION_FORM={SUBMISSION_FORM} />
       <Marquee items={['Resilient Architecture', 'Living with water', ...tags, 'Studio 7 · RMUTT', 'Climate adaptation']} />
 
-      <section id="schedule" className="section wrap">
+      <section id="schedule" className="section wrap" data-edit="EVENTS">
         <SectionHead no="01" kicker="Schedule" title="กิจกรรมที่กำลังจะมาถึง" lead={`${upcoming.length} กิจกรรมในภาคการศึกษานี้ — เพิ่มลงปฏิทินได้จากแต่ละกิจกรรม`} />
         {upcoming.length ? (
           <ol className="timeline">
@@ -141,7 +141,7 @@ export default function Events() {
         )}
       </section>
 
-      <section className="section band">
+      <section className="section band" data-edit="GALLERY">
         <div className="wrap">
           <SectionHead no="02" kicker="Workshop Gallery" title="บรรยากาศ Workshop" lead={`${GALLERY.length} ภาพจากห้องเรียน Studio 7`} />
           <div className="masonry">
@@ -163,7 +163,7 @@ export default function Events() {
       <section id="lectures" className="section band">
         <div className="wrap">
         <SectionHead no="04" kicker="Special Lectures" title="Special lecture" />
-        <ol className="lecture-list">
+        <ol className="lecture-list" data-edit="LECTURE_LINKS">
           {LECTURE_LINKS.map((l, i) => (
             <li key={l.no} data-reveal style={{ '--d': i }}>
               <a href={l.href} target="_blank" rel="noreferrer">
@@ -174,7 +174,7 @@ export default function Events() {
             </li>
           ))}
         </ol>
-        <div className="videos">
+        <div className="videos" data-edit="VIDEOS">
           {VIDEOS.map((v, i) => <div key={v.id} data-reveal style={{ '--d': i % 2 }}><Video id={v.id} title={v.title} /></div>)}
         </div>
         </div>
@@ -183,7 +183,7 @@ export default function Events() {
       <section id="references" className="section">
         <div className="wrap">
           <SectionHead no="05" kicker="References" title="เอกสารอ้างอิง" />
-          <div className="refs">
+          <div className="refs" data-edit="REFERENCE_DOCS">
             {REFERENCE_DOCS.map((r, i) => (
               <a key={r.href} className="ref-card" href={r.href} target="_blank" rel="noreferrer" data-reveal style={{ '--d': i }}>
                 <span className="ref-img zoom"><img src={thumb(r.img)} alt="" loading="lazy" /></span>
@@ -192,13 +192,13 @@ export default function Events() {
               </a>
             ))}
           </div>
-          <ul className="ref-links" data-reveal>
+          <ul className="ref-links" data-reveal data-edit="REFERENCE_LINKS">
             {REFERENCE_LINKS.map((r) => (
               <li key={r.href}><a className="link-arrow" href={r.href} target="_blank" rel="noreferrer">{r.title} <i>↗</i></a></li>
             ))}
           </ul>
 
-          <div className="floating">
+          <div className="floating" data-edit="FLOATING">
             <div className="floating-text" data-reveal>
               <span className="tag tag-cyan">Project</span>
               <h3>{FLOATING.title}</h3>

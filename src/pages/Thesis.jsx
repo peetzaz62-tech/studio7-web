@@ -69,7 +69,7 @@ export default function Thesis({ slug }) {
 
   return (
     <div className={`accent-${accent}`}>
-      <section className={`thesis-hero accent-${accent}`} ref={hero}>
+      <section className={`thesis-hero accent-${accent}`} ref={hero} data-edit="title titleTh by year location hero">
         {cover && <div className="thesis-hero-bg" style={{ backgroundImage: `url(${img(cover)})` }} />}
         <div className="wrap thesis-hero-inner">
           <a className="back-link hero-in" style={{ '--d': 0 }} href={`/projects/${t.year}`}>← Projects {t.year}</a>
@@ -80,7 +80,7 @@ export default function Thesis({ slug }) {
         </div>
       </section>
 
-      <section className="section wrap">
+      <section className="section wrap" data-edit="text facts note social">
         <div className="split">
           <div>
             <SectionHead no={no()} kicker="Overview" title="แนวคิดโครงการ" />
@@ -105,7 +105,7 @@ export default function Thesis({ slug }) {
       </section>
 
       {t.pages && t.pages.length > 0 && (
-        <section className="section band">
+        <section className="section band" data-edit="pages">
           <div className="wrap">
             <SectionHead no={no()} kicker="Portfolio" title={`Portfolio · ${t.pages.length} หน้า`} lead="เลื่อนซ้าย–ขวา หรือกดที่หน้าเพื่อดูเต็มจอ" />
             <Portfolio pages={t.pages} onOpen={show} />
@@ -114,7 +114,7 @@ export default function Thesis({ slug }) {
       )}
 
       {(t.chart || t.models?.length > 0) && (
-        <section className="section wrap">
+        <section className="section wrap" data-edit="chart chartLabel models modelCaption">
           <SectionHead no={no()} kicker="Presentation" title={t.chartLabel || 'Chart and model'} />
           {t.chart && (
             <button type="button" className="chart-board zoom" onClick={() => show([t.chart, ...(t.models || [])], 0)} aria-label="ดูบอร์ดขนาดใหญ่" data-reveal>
@@ -126,7 +126,7 @@ export default function Thesis({ slug }) {
       )}
 
       {t.final && (
-        <section className="section band">
+        <section className="section band" data-edit="final finalLabel">
           <div className="wrap">
             <SectionHead no={no()} kicker={`Thesis ${t.year}`} title={t.finalLabel || 'Final presentation'} />
             <Grid items={t.final} cls="final-grid" onOpen={show} />
@@ -135,7 +135,7 @@ export default function Thesis({ slug }) {
       )}
 
       {t.video && (
-        <section className="section wrap">
+        <section className="section wrap" data-edit="video">
           <SectionHead no={no()} kicker="Video" title={t.video.title} />
           <div className="single-video" data-reveal><Video id={t.video.id} title={t.video.title} /></div>
         </section>

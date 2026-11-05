@@ -4,6 +4,7 @@ import { DEFAULT_CONTENT, CONTENT_KEYS, mergeContent } from '../data/index.js'
 import { navigate } from '../router.js'
 import Logo from '../components/Logo.jsx'
 import { Field } from './Editor.jsx'
+import PreviewPane from './PreviewPane.jsx'
 import { SECTIONS, CATEGORIES, KEY_TITLES, KEY_DESC, FIELD_GROUPS, LABELS, blank } from './schema.js'
 import './admin.css'
 
@@ -125,9 +126,10 @@ function NewEntry({ map, existing, onCreate }) {
 
 /* ------------------------------------------------------------------ panel */
 // การ์ดพับได้ หนึ่งการ์ดต่อหนึ่งหัวข้อ
-function Panel({ id, title, desc, count, changed, onReset, defaultOpen, children }) {
+function Panel({ id, title, desc, count, changed, onReset, defaultOpen, onActivate, children }) {
   return (
-    <details className="ad-panel" id={id} open={defaultOpen}>
+    <details className="ad-panel" id={id} open={defaultOpen}
+      onToggle={(e) => { if (e.currentTarget.open) onActivate?.() }} onFocusCapture={() => onActivate?.()} onPointerDownCapture={() => onActivate?.()}>
       <summary>
         <span className="ad-panel-title">
           <strong>{title}</strong>
@@ -148,7 +150,7 @@ function Panel({ id, title, desc, count, changed, onReset, defaultOpen, children
 }
 
 // หน้า Projects / Thesis: แบ่งช่องเป็นกลุ่ม
-function GroupedEntry({ map, value, all, onChange }) {
+function GroupedEntry({ map, value, all, onChange, onActivate }) {
   const groups = FIELD_GROUPS[map] || []
   const siblingKeys = [...new Set(Object.values(all).flatMap((v) => Object.keys(v || {})))]
   const template = (k) => blank(Object.values(all).find((v) => v?.[k] !== undefined)?.[k] ?? '')
@@ -161,7 +163,7 @@ function GroupedEntry({ map, value, all, onChange }) {
     const missing = g.keys.filter((k) => value[k] === undefined && siblingKeys.includes(k))
     if (!present.length && !missing.length) return null
     return (
-      <Panel key={g.label} id={`ad-g-${gi}`} title={g.label} desc={g.desc} defaultOpen={gi === 0}>
+      <Panel key={g.label} id={`ad-g-${gi}`} title={g.label} desc={g.desc} defaultOpen={gi === 0} onActivate={() => onActivate?.({ tokens: g.keys, label: g.label })}>
         <div className="ad-fields">
           {present.map((k) => <Field key={k} k={k} value={value[k]} onChange={(x) => set(k, x)} onRemove={() => remove(k)} />)}
         </div>
@@ -262,6 +264,13 @@ export default function Admin() {
   const [sid, setSid] = useState(params.get('s') || 'home')
   const [entry, setEntry] = useState(params.get('k') || '')
   const [focusKey, setFocusKey] = useState(null)
+  const [active, setActive] = useState(null)
+  // เปลี่ยนส่วนที่ไฮไลต์เฉพาะเมื่อย้ายไปหัวข้ออื่น (คลิกในหัวข้อเดิมไม่ทำให้พรีวิวเลื่อนกลับ)
+  const activate = useCallback((a) => setActive((p) => (p && a && p.label === a.label && p.tokens.join() === a.tokens.join() ? p : a)), [])
+  const readPref = (k, d) => { try { return localStorage.getItem(k) ?? d } catch { return d } }
+  const [showPreview, setShowPreview] = useState(() => readPref('s7-admin-preview', matchMedia('(min-width: 1200px)').matches ? '1' : '0') === '1')
+  const [device, setDevice] = useState(() => readPref('s7-admin-device', 'desktop'))
+  useEffect(() => { try { localStorage.setItem('s7-admin-preview', showPreview ? '1' : '0'); localStorage.setItem('s7-admin-device', device) } catch { /* ไม่มี storage ก็ไม่เป็นไร */ } }, [showPreview, device])
   const section = sectionById(sid)
 
   const checkMe = useCallback(() => api('/api/me').then(setMe).catch(() => setMe({ admin: false, configured: false, storage: false, unreachable: true })), [])
@@ -281,14 +290,16 @@ export default function Admin() {
   useEffect(() => {
     if (section?.map && !entries.includes(entry)) setEntry(section.map === 'PROJECTS' ? entries[entries.length - 1] || '' : entries[0] || '')
     if (!section?.map) setEntry('')
+    setActive(null)
     scrollTo(0, 0)
   }, [sid])
+  useEffect(() => { setActive(null) }, [entry])
 
   // เปิดและเลื่อนไปยังการ์ดที่เลือกจากทางลัด
   useEffect(() => {
     if (!focusKey) return
     const el = document.getElementById(`ad-k-${focusKey}`)
-    if (el) { el.open = true; setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60) }
+    if (el) { el.open = true; setActive({ tokens: [focusKey], label: KEY_TITLES[focusKey] || focusKey }); setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60) }
     setFocusKey(null)
   }, [focusKey, sid])
 
@@ -373,14 +384,15 @@ export default function Admin() {
         </a>
         <span className={`ad-state ${dirty ? 'dirty' : ''}`} aria-live="polite">{dirty ? '● ยังไม่บันทึก' : saved ? '✓ บันทึกล่าสุดแล้ว' : ''}</span>
         <div className="ad-actions">
-          <button className="ad-btn ad-ghost" onClick={() => navigate(viewPath)} title="ดูหน้าเว็บพร้อมการแก้ไข (ยังไม่บันทึกก็ดูได้)">ดูหน้าเว็บ ↗</button>
+          <button className={`ad-btn ad-ghost ${showPreview ? 'is-on' : ''}`} aria-pressed={showPreview} onClick={() => setShowPreview((v) => !v)}>พรีวิว</button>
+          <button className="ad-btn ad-ghost" onClick={() => navigate(viewPath)} title="เปิดหน้าเว็บเต็มจอพร้อมการแก้ไข (ยังไม่บันทึกก็ดูได้)">ดูหน้าเว็บ ↗</button>
           <button className="ad-btn ad-ghost" onClick={() => setShowHistory(true)}>ประวัติ</button>
           <button className="ad-btn ad-primary" disabled={!dirty || saving} onClick={save}>{saving ? 'กำลังบันทึก…' : 'บันทึก'}</button>
           <button className="ad-btn ad-ghost ad-logout" onClick={logout}>ออกจากระบบ</button>
         </div>
       </header>
 
-      <div className="ad-body">
+      <div className={`ad-body ${showPreview ? "has-preview" : ""}`}>
         {navOpen && <div className="ad-scrim" onClick={() => setNavOpen(false)} aria-hidden="true" />}
         <nav id="ad-side" className={`ad-side ${navOpen ? 'open' : ''}`} aria-label="ส่วนของเว็บ">
           <button className={`ad-side-item ${sid === 'home' ? 'on' : ''}`} onClick={() => go('home')}>ภาพรวม</button>
@@ -456,30 +468,31 @@ export default function Admin() {
 
                 {section.map
                   ? (entry && content[section.map][entry]
-                    ? <GroupedEntry map={section.map} value={content[section.map][entry]} all={content[section.map]} onChange={setEntryValue} />
+                    ? <GroupedEntry map={section.map} value={content[section.map][entry]} all={content[section.map]} onChange={setEntryValue} onActivate={activate} />
                     : <p className="ad-empty">เลือกรายการจากเมนูด้านซ้าย</p>)
                   : section.keys.map((k, i) => (
                     <Panel key={k} id={`ad-k-${k}`} title={KEY_TITLES[k] || k} desc={KEY_DESC[k]} count={countOf(content[k])}
                       changed={JSON.stringify(content[k]) !== JSON.stringify(DEFAULT_CONTENT[k])} onReset={() => resetKey(k)}
-                      defaultOpen={section.keys.length <= 2 || i === 0}>
+                      defaultOpen={section.keys.length <= 2 || i === 0} onActivate={() => activate({ tokens: [k], label: KEY_TITLES[k] || k })}>
                       <Field top k={k} value={content[k]} onChange={(v) => setKey(k, v)} />
                     </Panel>
                   ))}
               </>
             )}
+            {dirty && (
+              <div className="ad-savebar" role="region" aria-label="การแก้ไขที่ยังไม่บันทึก">
+                <span>มีการแก้ไขที่ยังไม่บันทึก</span>
+                <div className="ad-row">
+                  <button className="ad-btn ad-ghost ad-small" onClick={discard}>ยกเลิกการแก้ไข</button>
+                  <button className="ad-btn ad-primary ad-small" disabled={saving} onClick={save}>{saving ? 'กำลังบันทึก…' : 'บันทึก'}</button>
+                </div>
+              </div>
+            )}
           </div>
         </main>
+        {showPreview && <PreviewPane path={viewPath} content={content} active={active} device={device} setDevice={setDevice} onClose={() => setShowPreview(false)} />}
       </div>
 
-      {dirty && (
-        <div className="ad-savebar" role="region" aria-label="การแก้ไขที่ยังไม่บันทึก">
-          <span>มีการแก้ไขที่ยังไม่บันทึก</span>
-          <div className="ad-row">
-            <button className="ad-btn ad-ghost ad-small" onClick={discard}>ยกเลิกการแก้ไข</button>
-            <button className="ad-btn ad-primary ad-small" disabled={saving} onClick={save}>{saving ? 'กำลังบันทึก…' : 'บันทึก'}</button>
-          </div>
-        </div>
-      )}
 
       {showHistory && <History onRestore={restore} onClose={() => setShowHistory(false)} />}
     </div>

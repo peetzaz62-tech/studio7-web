@@ -5,7 +5,7 @@ import { useContent } from '../content.jsx'
 export default function Download() {
   const { DOWNLOADS } = useContent()
   return (
-    <div className="accent-blue">
+    <div className="accent-blue" data-edit="DOWNLOADS">
       <PageHero kicker="Download" title="Download" subtitle="หนังสือและคู่มือจาก Resilient Architecture by Studio 7" accent="blue" />
       <section className="section wrap books">
         {DOWNLOADS.map((b, i) => (

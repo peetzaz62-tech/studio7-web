@@ -712,3 +712,22 @@ html.booted .split-w > span { animation: word-up 1.05s var(--ease-out) both; ani
 
 /* เปิดเมนูมือถือ: ปิด blur ของแถบหัว (ไม่งั้นเมนูเต็มจอจะถูกจำกัดอยู่ในแถบ) */
 .site-header.is-open { backdrop-filter: none; -webkit-backdrop-filter: none; background: transparent; border-bottom-color: transparent; }
+
+/* ---------- โหมดพรีวิวใน dashboard ---------- */
+html.is-preview [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important; }
+html.is-preview .gauge, html.is-preview .edit-fab, html.is-preview .route-loader { display: none !important; }
+html.is-preview { scroll-behavior: smooth; }
+.pv-overlay {
+  position: fixed; z-index: 500; pointer-events: none; display: none;
+  outline: 3px solid #1e6c93; outline-offset: -3px; background: rgba(30, 108, 147, .07);
+  transition: top .25s, left .25s, width .25s, height .25s;
+}
+.pv-overlay::before {
+  content: attr(data-label); position: absolute; left: 0; top: 0; padding: 4px 10px;
+  background: #1e6c93; color: #fff; font: 600 13px/1.4 'IBM Plex Sans Thai', system-ui, sans-serif; white-space: nowrap;
+}
+.pv-overlay[data-label=""]::before { display: none; }
+/* ในพรีวิว "จอ" สูงกว่าจริงมาก — จำกัดความสูงส่วนหัวให้เท่าจอคอมทั่วไป */
+html.is-preview .hero { min-height: min(100svh, 820px); }
+html.is-preview .thesis-hero { min-height: min(82svh, 680px); }
+html.is-preview .notfound { min-height: min(92svh, 760px); }

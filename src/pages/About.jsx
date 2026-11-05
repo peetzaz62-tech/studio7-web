@@ -7,7 +7,7 @@ import { useContent } from '../content.jsx'
 export default function About() {
   const { ABOUT } = useContent()
   return (
-    <div className="accent-yellow">
+    <div className="accent-yellow" data-edit="ABOUT">
       <PageHero kicker="About us" title="Resilient architecture" subtitle="Faculty of Architecture, RMUTT · Water Adaptation Innovation Center" accent="yellow" />
 
       <section className="section wrap">

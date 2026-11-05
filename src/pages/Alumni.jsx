@@ -6,7 +6,7 @@ import { useContent } from '../content.jsx'
 export default function Alumni() {
   const { ALUMNI } = useContent()
   return (
-    <div className="accent-pink">
+    <div className="accent-pink" data-edit="ALUMNI">
       <PageHero kicker="Alumni" title="Alumni" accent="pink" />
       <section className="section wrap">
         <p className="lead-text" data-reveal>{ALUMNI.intro}</p>

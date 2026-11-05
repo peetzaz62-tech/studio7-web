@@ -9,7 +9,7 @@
     <meta name="description" content="Events 2026–2027 — Resilient Architecture, Studio 7, Faculty of Architecture RMUTT" />
     <script>
       // หน้าโหลดแสดงเฉพาะการเข้าเว็บครั้งแรก (และอีกครั้งเมื่อห่างไปเกิน 30 วัน)
-      try { var t = +localStorage.getItem('s7-intro'); document.documentElement.classList.add(t && Date.now() - t < 2592e6 ? 'no-intro' : 'boot-lock') } catch (e) { document.documentElement.classList.add('no-intro') }
+      try { var t = +localStorage.getItem('s7-intro'); document.documentElement.classList.add((t && Date.now() - t < 2592e6) || /[?&]preview=/.test(location.search) ? 'no-intro' : 'boot-lock') } catch (e) { document.documentElement.classList.add('no-intro') }
     </script>
     <style>
       html.boot-lock { overflow: hidden; }

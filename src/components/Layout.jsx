@@ -51,7 +51,7 @@ function Header({ path, overHero }) {
   const groupActive = (item) => item.children.some((c) => isActive(c.path, path)) || (item.label === 'Projects' && path.startsWith('/thesis/'))
   let i = 0
   return (
-    <header className={`site-header ${transparent ? 'is-clear' : 'is-solid'} ${hidden && !open ? 'is-hidden' : ''} ${open ? 'is-open' : ''}`}>
+    <header data-edit="NAV" className={`site-header ${transparent ? 'is-clear' : 'is-solid'} ${hidden && !open ? 'is-hidden' : ''} ${open ? 'is-open' : ''}`}>
       <div className="wrap header-row">
         <a href="/" className="brand" aria-label="Resilient Architecture by Studio 7 — หน้าแรก">
           <span className="brand-mark"><Logo /></span>
@@ -110,7 +110,7 @@ function Footer() {
   const { FOOTER, NAV } = useContent()
   const links = NAV.flatMap((n) => (n.children ? n.children : [n]))
   return (
-    <footer className="site-footer">
+    <footer className="site-footer" data-edit="FOOTER">
       <svg className="footer-wave" viewBox="0 0 1440 60" preserveAspectRatio="none" aria-hidden="true">
         <path d="M0 30 C 180 0 360 0 540 30 S 900 60 1080 30 S 1260 0 1440 30 V60 H0 Z" />
       </svg>

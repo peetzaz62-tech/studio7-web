@@ -4,7 +4,7 @@ import { useContent } from '../content.jsx'
 export default function Submission() {
   const { SUBMISSION } = useContent()
   return (
-    <div className="accent-red">
+    <div className="accent-red" data-edit="SUBMISSION">
       <PageHero kicker="Submission" title="Project submission" accent="red" />
       <section className="section wrap">
         <p className="lead-text" data-reveal>{SUBMISSION.intro}</p>
