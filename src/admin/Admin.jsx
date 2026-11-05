@@ -18,14 +18,19 @@ const api = async (path, opts = {}) => {
 const changedKeys = (c) => Object.fromEntries(CONTENT_KEYS.filter((k) => JSON.stringify(c[k]) !== JSON.stringify(DEFAULT_CONTENT[k])).map((k) => [k, c[k]]))
 const fmtTime = (iso) => new Date(iso).toLocaleString('th-TH', { dateStyle: 'medium', timeStyle: 'short' })
 
-function Login({ onDone, configured }) {
+function Login({ onDone, configured, storage, unreachable }) {
   const [pw, setPw] = useState('')
   const [err, setErr] = useState('')
   const [busy, setBusy] = useState(false)
   const submit = async (e) => {
     e.preventDefault()
     setBusy(true); setErr('')
-    try { await api('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) }); onDone() } catch (x) { setErr(x.message) } finally { setBusy(false) }
+    try {
+      await api('/api/login', { method: 'POST', body: JSON.stringify({ password: pw }) })
+      const me = await api('/api/me')
+      if (!me.admin) setErr('รหัสผ่านถูกต้อง แต่เบราว์เซอร์ไม่บันทึกการเข้าสู่ระบบ (cookie) — ลองปิดโหมดบล็อกคุกกี้ หรือใช้เบราว์เซอร์อื่น')
+      else onDone()
+    } catch (x) { setErr(x.message) } finally { setBusy(false) }
   }
   return (
     <div className="ad-login">
@@ -36,6 +41,11 @@ function Login({ onDone, configured }) {
         {!configured && (
           <p className="ad-warn">Worker ยังไม่เห็นรหัสผ่าน admin — ใน Cloudflare → rmuttstudio7-web → Settings → Variables and Secrets เพิ่มชื่อ <code>ADMIN_PASSWORD</code> เลือก Type เป็น <b>Secret</b> แล้วกด <b>Deploy</b></p>
         )}
+        <p className="ad-status" aria-label="สถานะระบบ">
+          สถานะระบบ: <span className={configured ? 'ok' : 'no'}>{configured ? '✓' : '✗'} รหัสผ่าน admin</span>
+          <span className={storage ? 'ok' : 'no'}>{storage ? '✓' : '✗'} ที่เก็บข้อมูล</span>
+          {unreachable && <span className="no">✗ ติดต่อเซิร์ฟเวอร์ไม่ได้</span>}
+        </p>
         <label htmlFor="ad-pw">รหัสผ่าน</label>
         <input id="ad-pw" type="password" autoComplete="current-password" className="ad-input" value={pw} onChange={(e) => setPw(e.target.value)} autoFocus />
         {err && <p className="ad-err" role="alert">{err}</p>}
@@ -102,7 +112,7 @@ export default function Admin() {
   const [entry, setEntry] = useState(params.get('k') || '')
   const section = SECTIONS.find((s) => s.id === sid) || SECTIONS[0]
 
-  const checkMe = useCallback(() => api('/api/me').then(setMe).catch(() => setMe({ admin: false, configured: true })), [])
+  const checkMe = useCallback(() => api('/api/me').then(setMe).catch(() => setMe({ admin: false, configured: false, storage: false, unreachable: true })), [])
   useEffect(() => { checkMe() }, [checkMe])
 
   // โหลดเนื้อหาล่าสุดจากเซิร์ฟเวอร์ (ถ้ายังไม่มีงานที่แก้ค้างไว้)
@@ -157,7 +167,7 @@ export default function Admin() {
   const logout = async () => {
     if (dirty && !confirm('ยังมีการแก้ไขที่ไม่ได้บันทึก ออกจากระบบเลยไหม?')) return
     await api('/api/logout', { method: 'POST' }).catch(() => {})
-    setSaved(null); setMe({ admin: false, configured: true })
+    setSaved(null); checkMe()
   }
 
   const setKey = (k, v) => setContent((c) => ({ ...c, [k]: v }))
@@ -187,7 +197,7 @@ export default function Admin() {
     : entries), [entries.join(), sid])
 
   if (!me) return <p className="admin-loading">กำลังโหลด…</p>
-  if (!me.admin) return <Login configured={me.configured} onDone={checkMe} />
+  if (!me.admin) return <Login configured={me.configured} storage={me.storage} unreachable={me.unreachable} onDone={checkMe} />
 
   return (
     <div className="ad-shell">

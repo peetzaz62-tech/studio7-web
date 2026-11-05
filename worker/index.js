@@ -39,7 +39,7 @@ async function isAdmin(req, env) {
   if (!tok) return false
   const [exp, sig] = tok.split('.')
   if (!exp || !sig || Number(exp) < Date.now()) return false
-  return safeEqual(sig, await hmac(env.ADMIN_PASSWORD, exp))
+  return safeEqual(sig, await hmac(String(env.ADMIN_PASSWORD).trim(), exp))
 }
 function sessionCookies(value, maxAge) {
   const h = new Headers()
@@ -114,17 +114,16 @@ export default {
       if (method !== 'GET' && req.headers.get('origin') && req.headers.get('origin') !== url.origin) {
         return json({ error: 'คำขอไม่ได้มาจากเว็บนี้' }, 403)
       }
-      if (!env.SITE) return json({ error: 'ยังไม่ได้ผูก KV (SITE)' }, 500)
 
       if (pathname === '/api/login' && method === 'POST') {
         if (!env.ADMIN_PASSWORD) return json({ error: 'ยังไม่ได้ตั้งรหัสผ่าน admin (ADMIN_PASSWORD) ใน Cloudflare' }, 503)
         const { password } = await req.json().catch(() => ({}))
-        if (typeof password !== 'string' || !safeEqual(password, env.ADMIN_PASSWORD)) {
+        if (typeof password !== 'string' || !safeEqual(password.trim(), String(env.ADMIN_PASSWORD).trim())) {
           await new Promise((r) => setTimeout(r, 800))
           return json({ error: 'รหัสผ่านไม่ถูกต้อง' }, 401)
         }
         const exp = String(Date.now() + SESSION_DAYS * 864e5)
-        const tok = `${exp}.${await hmac(env.ADMIN_PASSWORD, exp)}`
+        const tok = `${exp}.${await hmac(String(env.ADMIN_PASSWORD).trim(), exp)}`
         const h = sessionCookies(tok, SESSION_DAYS * 86400)
         h.set('content-type', 'application/json')
         h.set('cache-control', 'no-store')
@@ -134,7 +133,11 @@ export default {
         const h = sessionCookies('', 0); h.set('content-type', 'application/json')
         return new Response('{"ok":true}', { headers: h })
       }
-      if (pathname === '/api/me') return json({ admin: await isAdmin(req, env), configured: !!env.ADMIN_PASSWORD })
+      if (pathname === '/api/me') {
+        // สถานะระบบสำหรับหน้าล็อกอิน (บอกแค่ว่ามี/ไม่มี ไม่เปิดเผยค่าจริง)
+        return json({ admin: await isAdmin(req, env), configured: !!String(env.ADMIN_PASSWORD || '').trim(), storage: !!env.SITE })
+      }
+      if (!env.SITE) return json({ error: 'ยังไม่มีที่เก็บข้อมูล (KV binding SITE) — ดูวิธีแก้ใน README' }, 503)
       if (pathname === '/api/content' && method === 'GET') return json(mergeContent(await getStored(env)))
 
       // ---- ต้องล็อกอิน ----
