@@ -21,7 +21,7 @@
 .ad-link { background: none; border: 0; padding: 0; font: inherit; font-size: .82rem; color: var(--teal); cursor: pointer; text-decoration: underline; }
 .ad-hint { display: block; color: var(--muted); font-size: .8rem; margin: -2px 0 6px; }
 .ad-err { color: #c62828; font-size: .85rem; }
-.ad-warn { background: #fff4d6; color: #5c4400; padding: 10px 12px; border-radius: 6px; font-size: .88rem; }
+.ad-warn, .ad-login-card .ad-warn { background: #fff4d6; color: #5c4400; padding: 10px 12px; border-radius: 6px; font-size: .88rem; }
 .ad-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .ad-grow > .ad-input { flex: 1; }
 .ad-open { font-size: .82rem; color: var(--teal); white-space: nowrap; }

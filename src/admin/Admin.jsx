@@ -34,7 +34,7 @@ function Login({ onDone, configured }) {
         <h1>Studio 7 Admin</h1>
         <p>เข้าสู่ระบบเพื่อแก้ไขเนื้อหาเว็บไซต์</p>
         {!configured && (
-          <p className="ad-warn">ยังไม่ได้ตั้งรหัสผ่าน admin — ตั้ง secret ชื่อ <code>ADMIN_PASSWORD</code> ใน Cloudflare → Worker → Settings → Variables and Secrets</p>
+          <p className="ad-warn">Worker ยังไม่เห็นรหัสผ่าน admin — ใน Cloudflare → rmuttstudio7-web → Settings → Variables and Secrets เพิ่มชื่อ <code>ADMIN_PASSWORD</code> เลือก Type เป็น <b>Secret</b> แล้วกด <b>Deploy</b></p>
         )}
         <label htmlFor="ad-pw">รหัสผ่าน</label>
         <input id="ad-pw" type="password" autoComplete="current-password" className="ad-input" value={pw} onChange={(e) => setPw(e.target.value)} autoFocus />

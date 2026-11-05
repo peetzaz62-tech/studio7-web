@@ -12,5 +12,7 @@
   },
   // KV เก็บเนื้อหาที่แก้จาก dashboard + รูปที่อัปโหลด — ไม่ต้องใส่ id: wrangler สร้างให้อัตโนมัติตอน deploy ครั้งแรก
   "kv_namespaces": [{ "binding": "SITE" }],
-  "observability": { "enabled": true }
+  "observability": { "enabled": true },
+  // ไม่ลบตัวแปรที่ตั้งใน Cloudflare dashboard ตอน deploy (เช่น ADMIN_PASSWORD ถ้าตั้งเป็นแบบ Text)
+  "keep_vars": true
 }
