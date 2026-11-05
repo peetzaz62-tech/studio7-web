@@ -1,21 +1,25 @@
 import { useEffect, useState } from 'react'
-import { NAV, FOOTER } from '../data/site.js'
+import { useContent, useContentState, isAdminHint } from '../content.jsx'
+import { imgUrl as img } from '../media.js'
+import WaterGauge from './WaterGauge.jsx'
 
-const img = (f) => `./img/${f}`
+const isActive = (path, current) => (path === '/' ? current === '/' || current === '/events' : current === path || current.startsWith(path + '/'))
 
-function NavItem({ item, route }) {
+function NavItem({ item, path }) {
+  const active = isActive(item.path, path)
   return (
-    <a href={`#${item.id}`} className={`nav-link ${route === item.id ? 'active' : ''}`} aria-current={route === item.id ? 'page' : undefined}>
+    <a href={item.path} className={`nav-link ${active ? 'active' : ''}`} aria-current={active ? 'page' : undefined}>
       {item.label}
     </a>
   )
 }
 
-function Header({ route }) {
+function Header({ path, overHero }) {
+  const { NAV } = useContent()
   const [open, setOpen] = useState(false)
   const [solid, setSolid] = useState(false)
 
-  useEffect(() => { setOpen(false) }, [route])
+  useEffect(() => { setOpen(false) }, [path])
   useEffect(() => {
     const onScroll = () => setSolid(window.scrollY > 40)
     onScroll()
@@ -23,11 +27,12 @@ function Header({ route }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const overHero = route === 'events' && !solid && !open
+  const transparent = overHero && !solid && !open
+  const groupActive = (item) => item.children.some((c) => isActive(c.path, path)) || (item.label === 'Projects' && path.startsWith('/thesis/'))
   return (
-    <header className={`site-header ${overHero ? '' : 'is-solid'}`}>
+    <header className={`site-header ${transparent ? '' : 'is-solid'}`}>
       <div className="wrap header-row">
-        <a href="#events" className="brand" aria-label="Resilient Architecture by Studio 7">
+        <a href="/" className="brand" aria-label="Resilient Architecture by Studio 7">
           <img src={img('logo-7.png')} alt="" />
           <span>Resilient<br />Architecture</span>
         </a>
@@ -40,15 +45,15 @@ function Header({ route }) {
           {NAV.map((item) =>
             item.children ? (
               <div className="nav-group" key={item.label}>
-                <span className={`nav-link ${(route.startsWith('projects') || route.startsWith('thesis')) ? 'active' : ''}`} tabIndex={0}>
+                <span className={`nav-link ${groupActive(item) ? 'active' : ''}`} tabIndex={0}>
                   {item.label} <i aria-hidden="true">▾</i>
                 </span>
                 <div className="dropdown">
-                  {item.children.map((c) => <NavItem key={c.id} item={c} route={route} />)}
+                  {item.children.map((c) => <NavItem key={c.path} item={c} path={path} />)}
                 </div>
               </div>
             ) : (
-              <NavItem key={item.id} item={item} route={route} />
+              <NavItem key={item.path} item={item} path={path} />
             )
           )}
         </nav>
@@ -60,25 +65,25 @@ function Header({ route }) {
 function CopyEmail({ email }) {
   const [done, setDone] = useState(false)
   const copy = async (e) => {
+    const holder = e.currentTarget.parentNode.querySelector('.email-addr')
     try {
       await navigator.clipboard.writeText(email)
       setDone(true); setTimeout(() => setDone(false), 1800)
     } catch {
-      const r = document.createRange(); r.selectNodeContents(e.currentTarget.parentNode.querySelector('.email-addr'))
+      const r = document.createRange(); r.selectNodeContents(holder)
       const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r)
     }
   }
   return (
     <p className="email">
-      email: {import.meta.env.VITE_ARTIFACT
-        ? <span className="email-addr">{email}</span>
-        : <a className="email-addr" href={`mailto:${email}`}>{email}</a>}
+      email: <a className="email-addr" href={`mailto:${email}`}>{email}</a>
       <button type="button" className="copy-btn" onClick={copy}>{done ? 'คัดลอกแล้ว' : 'คัดลอก'}</button>
     </p>
   )
 }
 
 function Footer() {
+  const { FOOTER } = useContent()
   return (
     <footer className="site-footer">
       <div className="wrap footer-grid">
@@ -100,12 +105,27 @@ function Footer() {
   )
 }
 
-export default function Layout({ route, children }) {
+// ปุ่มลอย "แก้ไขหน้านี้" — แสดงเฉพาะเครื่องที่ล็อกอิน admin ไว้
+function EditButton({ editLink }) {
+  const { dirty } = useContentState()
+  const [show, setShow] = useState(false)
+  useEffect(() => { setShow(isAdminHint()) }, [editLink])
+  if (!show || !editLink) return null
+  return (
+    <a className={`edit-fab ${dirty ? 'is-dirty' : ''}`} href={editLink}>
+      ✎ แก้ไขหน้านี้{dirty && <small>มีการแก้ไขที่ยังไม่บันทึก (กำลังแสดงตัวอย่าง)</small>}
+    </a>
+  )
+}
+
+export default function Layout({ path, overHero, editLink, children }) {
   return (
     <>
-      <Header route={route} />
+      <WaterGauge />
+      <Header path={path} overHero={overHero} />
       <main id="main">{children}</main>
       <Footer />
+      <EditButton editLink={editLink} />
     </>
   )
 }

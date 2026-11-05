@@ -4,20 +4,20 @@
 
 
 export const NAV = [
-  { label: 'Events', id: 'events' },
-  { label: 'About us', id: 'about-us' },
+  { label: 'Events', path: '/' },
+  { label: 'About us', path: '/about-us' },
   {
     label: 'Projects',
     children: [
-      { label: 'Year 2024', id: 'projects-2024' },
-      { label: 'Year 2025', id: 'projects-2025' },
-      { label: 'Year 2026', id: 'projects-2026' },
-      { label: 'Year 2027', id: 'projects-2027' },
+      { label: 'Year 2024', path: '/projects/2024' },
+      { label: 'Year 2025', path: '/projects/2025' },
+      { label: 'Year 2026', path: '/projects/2026' },
+      { label: 'Year 2027', path: '/projects/2027' },
     ],
   },
-  { label: 'Submission', id: 'submission' },
-  { label: 'Alumni', id: 'alumni' },
-  { label: 'Download', id: 'download' },
+  { label: 'Submission', path: '/submission' },
+  { label: 'Alumni', path: '/alumni' },
+  { label: 'Download', path: '/download' },
 ]
 
 export const HERO = {
@@ -26,6 +26,7 @@ export const HERO = {
   semester: 'First / Second Semester',
   text: 'Explore our ongoing and past events that showcase how resilience in architecture is being translated into action, education, and community engagement.',
   website: 'www.deresilient.com',
+  image: 'hero-bg.jpg',
 }
 
 export const SUBMISSION_FORM =

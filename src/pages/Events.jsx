@@ -2,11 +2,11 @@ import { useState } from 'react'
 import { scrollToId } from '../router.js'
 import { useGallery } from '../components/Lightbox.jsx'
 import Video from '../components/Video.jsx'
-import {
-  HERO, EVENTS, LECTURE_LINKS, VIDEOS, REFERENCE_DOCS, REFERENCE_LINKS, FLOATING, GALLERY, SUBMISSION_FORM,
-} from '../data/site.js'
-
-const img = (f) => `./img/${f}`
+import ThesisMap from '../components/ThesisMap.jsx'
+import Countdown from '../components/Countdown.jsx'
+import { googleCalendarUrl, downloadIcs } from '../calendar.js'
+import { imgUrl as img, thumbUrl as thumb } from '../media.js'
+import { useContent } from '../content.jsx'
 const DAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT']
 const parse = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d) }
 const dd = (n) => String(n).padStart(2, '0')
@@ -37,7 +37,7 @@ function EventCard({ ev, today, onPhoto }) {
         <h3>{ev.title}</h3>
         {ev.subtitle && <p className="event-sub">{ev.subtitle}</p>}
         <p className="event-time">
-          {fmt(start)}{ev.endDate ? ` – ${fmt(end)}` : ''} · {ev.time} น.
+          {fmt(start)}{ev.endDate ? ` – ${fmt(end)}` : ''}{ev.time ? ` · ${ev.time} น.` : ''}
         </p>
         {ev.link && (
           <a className="text-link" href={ev.link.href} target="_blank" rel="noreferrer">{ev.link.label} ↗</a>
@@ -48,11 +48,17 @@ function EventCard({ ev, today, onPhoto }) {
             <a className="btn btn-small" href={ev.action.href} target="_blank" rel="noreferrer">{ev.action.cta} ↗</a>
           </div>
         )}
-        {ev.photos && (
+        {status !== 'past' && (
+          <div className="cal-actions" aria-label="เพิ่มลงปฏิทิน">
+            <a className="cal-btn" href={googleCalendarUrl(ev)} target="_blank" rel="noreferrer">＋ Google Calendar</a>
+            <button type="button" className="cal-btn" onClick={() => downloadIcs(ev)}>＋ ปฏิทินในเครื่อง (.ics)</button>
+          </div>
+        )}
+        {ev.photos?.length > 0 && (
           <div className="event-photos">
             {ev.photos.map((p, i) => (
               <button key={p} onClick={() => onPhoto(ev.photos, i)} aria-label="ดูรูปขนาดใหญ่">
-                <img src={img(p)} alt="" loading="lazy" />
+                <img src={thumb(p)} alt="" loading="lazy" />
               </button>
             ))}
           </div>
@@ -63,6 +69,7 @@ function EventCard({ ev, today, onPhoto }) {
 }
 
 export default function Events() {
+  const { HERO, EVENTS, LECTURE_LINKS, VIDEOS, REFERENCE_DOCS, REFERENCE_LINKS, FLOATING, GALLERY, SUBMISSION_FORM } = useContent()
   const today = useToday()
   const [show, lightbox] = useGallery()
 
@@ -73,7 +80,7 @@ export default function Events() {
 
   return (
     <>
-      <section className="hero" style={{ backgroundImage: `url(${img('hero-bg.jpg')})` }}>
+      <section className="hero" style={{ backgroundImage: `url(${img(HERO.image || 'hero-bg.jpg')})` }}>
         <div className="wrap hero-inner">
           <span className="tag tag-green">{HERO.eyebrow}</span>
           <h1>{HERO.title}</h1>
@@ -83,7 +90,8 @@ export default function Events() {
             <button type="button" className="btn" onClick={() => scrollToId('schedule')}>ดูตารางกิจกรรม</button>
             <a className="btn btn-ghost" href={SUBMISSION_FORM} target="_blank" rel="noreferrer">Submission ↗</a>
           </div>
-          <a className="hero-site" href="https://www.deresilient.com" target="_blank" rel="noreferrer">{HERO.website}</a>
+          <Countdown events={EVENTS} />
+          <a className="hero-site" href={`https://${HERO.website.replace(/^https?:\/\//, '')}`} target="_blank" rel="noreferrer">{HERO.website}</a>
         </div>
       </section>
 
@@ -94,7 +102,7 @@ export default function Events() {
         </header>
         <div className="events">
           {upcoming.length ? upcoming.map((ev) => (
-            <EventCard key={ev.id} ev={ev} today={today} onPhoto={show} />
+            <EventCard key={ev.id || ev.date + ev.title} ev={ev} today={today} onPhoto={show} />
           )) : <p className="muted">ยังไม่มีกิจกรรมใหม่</p>}
         </div>
 
@@ -104,7 +112,7 @@ export default function Events() {
               <h2>กิจกรรมที่ผ่านมา</h2>
             </header>
             <div className="events">
-              {past.map((ev) => <EventCard key={ev.id} ev={ev} today={today} onPhoto={show} />)}
+              {past.map((ev) => <EventCard key={ev.id || ev.date + ev.title} ev={ev} today={today} onPhoto={show} />)}
             </div>
           </>
         )}
@@ -119,7 +127,7 @@ export default function Events() {
           <div className="gallery">
             {(showAll ? GALLERY : GALLERY.slice(0, 8)).map((g, i) => (
               <button key={g} onClick={() => show(GALLERY, i)} aria-label={`รูปที่ ${i + 1}`}>
-                <img src={img(g)} alt="" loading="lazy" />
+                <img src={thumb(g)} alt="" loading="lazy" />
               </button>
             ))}
           </div>
@@ -130,6 +138,8 @@ export default function Events() {
           )}
         </div>
       </section>
+
+      <ThesisMap />
 
       <section id="lectures" className="section wrap">
         <header className="section-head">
@@ -161,7 +171,7 @@ export default function Events() {
           <div className="refs">
             {REFERENCE_DOCS.map((r) => (
               <a key={r.href} className="ref-card" href={r.href} target="_blank" rel="noreferrer">
-                <img src={img(r.img)} alt="" loading="lazy" />
+                <img src={thumb(r.img)} alt="" loading="lazy" />
                 <span>{r.title} <i aria-hidden>↗</i></span>
               </a>
             ))}
@@ -181,7 +191,7 @@ export default function Events() {
             <div className="floating-imgs">
               {FLOATING.images.map((f, i) => (
                 <button key={f} onClick={() => show(FLOATING.images, i)} aria-label="ดูรูปขนาดใหญ่">
-                  <img src={img(f)} alt={FLOATING.title} loading="lazy" />
+                  <img src={thumb(f)} alt={FLOATING.title} loading="lazy" />
                 </button>
               ))}
             </div>

@@ -1,18 +1,23 @@
 # CLAUDE.md
 
-Static React 18 + Vite 5 site for "Resilient Architecture by Studio 7" (RMUTT), migrated from Google Sites.
-Deployed as a Cloudflare Worker with static assets (`wrangler.jsonc`, worker name `rmuttstudio7-web`, live at https://rmuttstudio7-web.peetzaz.workers.dev): Workers Builds runs `npm run build` then `npx wrangler deploy` on every push to `main`.
+React 18 + Vite 5 SPA + Cloudflare Worker for "Resilient Architecture by Studio 7" (RMUTT), migrated from Google Sites.
+Live: https://rmuttstudio7-web.peetzaz.workers.dev — Worker `rmuttstudio7-web` (`wrangler.jsonc`). Workers Builds runs `npm run build` then `npx wrangler deploy` on push to `main`.
 
 ## Architecture
-- No router library. `src/router.js` routes on a plain `location.hash` (`#events`, `#projects-2025`, `#thesis-tinn`).
-  Route names must be ASCII letters/digits/hyphens only (claude.ai artifact constraint) — no `#/path`, no underscores.
-- `src/App.jsx` maps a route to a page in `src/pages/`. Thesis routes are `thesis-<key>` where `<key>` is a key of `THESIS` in `src/data/thesis.js`.
-- All content lives in `src/data/*.js`; pages are presentational. Prefer editing data over JSX.
-- Images are in `public/img/` and referenced as `./img/<file>` (Vite `base: './'`).
-- `import.meta.env.VITE_ARTIFACT` is set only by `npm run build:artifact` (claude.ai preview): it swaps YouTube iframes for link cards and drops `mailto:`. The real site (`npm run build`) embeds videos.
-- Styling: one file, `src/styles.css`. Color tokens on `:root` with dark-mode overrides (prefers-color-scheme + `[data-theme]`). Neon marker tags (`.tag-green/cyan/yellow/blue/orange/red/pink`) mirror the original site; each year/page has an accent.
+- **Routing**: real paths (`/`, `/about-us`, `/projects/2025`, `/thesis/tinn`, `/admin`). `src/routes.js` (pure, shared with the Worker) parses paths; `src/router.js` intercepts same-origin `<a href="/...">` clicks (pushState). Old `#thesis-x` hash links are redirected client-side.
+- **Content**: defaults in `src/data/*.js`, combined in `src/data/index.js` (`DEFAULT_CONTENT`, top-level keys like `EVENTS`, `THESIS`, `PROJECTS`). Overrides saved from the dashboard live in KV key `content` (only keys that differ from defaults); `mergeContent` overlays per top-level key. Pages read via `useContent()` (`src/content.jsx`) — never import data modules directly in pages.
+- **Worker** (`worker/index.js`): `run_worker_first` for all paths except `/assets/*` and `/img/*`. HTML requests → serves `index.html` via `env.ASSETS` with HTMLRewriter-injected `<title>`/OG meta (`src/meta.js`) and `<script id="site-content">` (KV JSON). Also `/api/*` (login/logout/me/content/history/restore/upload), `/media/<id>` (uploaded images stored in KV `media:<id>`), `/sitemap.xml`. Unknown paths → 404 status.
+- **Auth**: single password secret `ADMIN_PASSWORD`; HMAC-signed HttpOnly cookie `s7_admin` (7 days) + readable hint cookie `s7_admin_ui` (UI only, not trusted). Mutating API calls check Origin.
+- **Admin UI** (`src/admin/`, lazy chunk): schema-driven generic editor (`Editor.jsx`) — field type inferred from key names/values in `schema.js` (images, image lists, dates, colors, long text, links, pair lists, object lists). Add Thai labels in `LABELS` when adding new fields. Draft edits live in the content context, so "ดูหน้าเว็บ" previews unsaved changes.
+- **Images**: `public/img/<name>.webp` + `<name>-sm.webp`; data keeps legacy `name.jpg` names, mapped by `imgUrl`/`thumbUrl` in `src/media.js`. Use `thumbUrl` in grids, `imgUrl` for lightbox/hero.
+- **Features**: `ThesisMap` (d3-geo + world-atlas, lazy; pins from `THESIS[*].location`), `Countdown` + `calendar.js` (Google Calendar/.ics, Asia/Bangkok UTC+7), `WaterGauge` (scroll progress as water level).
+- Styling: `src/styles.css` (site) and `src/admin/admin.css`; color tokens on `:root` with dark-mode overrides. Neon marker tags `.tag-*` mirror the original site.
+
+## Local dev
+`cp .dev.vars.example .dev.vars` then `npm run dev:worker` (wrangler dev on :8787 with local KV).
 
 ## Content notes carried over from the original site
 - Projects 2027 on Google Sites was a copy of 2024; only the intro was migrated.
-- `thesis.js` → `p4-2026` text on Google Sites was a copy of p1-2024; only images were migrated.
+- `p4-2026` text on Google Sites was a copy of p1-2024; only images were migrated.
 - Alumni Generation 4 (2027) lists the same names as Generation 3 on the original.
+- Several thesis map locations are approximate (`location.approx: true`).

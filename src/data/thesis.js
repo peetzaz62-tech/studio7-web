@@ -1,11 +1,13 @@
 // รายละเอียด Thesis ของนักศึกษาแต่ละคน (หน้าย่อยของ Projects)
 // key = ส่วนท้ายของลิงก์ เช่น #thesis-p1-2024, #thesis-tinn
+// location = ตำแหน่งบนแผนที่ (approx: true = ใช้พิกัดเมือง/ประเทศโดยประมาณ)
 // pages = หน้าพอร์ตโฟลิโอ, chart = บอร์ดนำเสนอ, models = รูปโมเดล, final = Final Day, hero = รูปเปิด
 export const THESIS = {
   "p1-2024": {
     "year": "2024",
     "title": "Nanotech air restorative architecture",
     "by": "Napatr Ekanai",
+    "location": {"place": "Bangkok, Thailand", "lat": 13.7563, "lng": 100.5018, "approx": true},
     "text": [
       "\"Air Quality, Urban Life, and Architectural Opportunity\"",
       "Air pollution, a byproduct of industrialization, continues to degrade air quality worldwide, especially in urban centers like those in Thailand. This environmental crisis directly impacts public health and economic stability. The World Health Organization reports that outdoor air pollution was responsible for millions of premature deaths in 2019, largely due to heart disease, stroke, respiratory infections, and cancer. As over half of the global population now lives in cities, exposure to harmful airborne particles is nearly unavoidable.",
@@ -36,6 +38,7 @@ export const THESIS = {
     "year": "2024",
     "title": "Architecture for Peaces",
     "by": "Nutchanon Hojirawutthanapun",
+    "location": {"place": "Nicosia buffer zone, Cyprus", "lat": 35.1856, "lng": 33.3823, "approx": false},
     "text": [
       "This research explores the conflict in Cyprus and proposes using architecture to ease tensions. The study examines peace architecture principles and space utilization in neutral areas. It also delves into the historical context of both sides to develop a peace architecture project in a mutually agreed-upon location. The project aims to create symbolic expressions of peace, reflecting cultural backgrounds and respecting heritage, and to ensure safety amidst ongoing conflict.",
       "The inspiration for the project comes from an interest in global politics and 20th-21st century wars, leading to the recognition of \"peace architecture.\" The conflict in Cyprus, marked by an internal revolution and subsequent division, serves as a compelling case study. The thesis aims to translate the historical context into peace architecture that symbolizes reunification and conveys the people's desire for reconciliation to their governments. The project will be implemented during ongoing tensions to foster peace and provide a shared collaborative space."
@@ -64,6 +67,7 @@ export const THESIS = {
     "year": "2024",
     "title": "Advanced data infrastructure Thailand",
     "by": "Tosapon Klinthuean",
+    "location": {"place": "Thailand", "lat": 13.7563, "lng": 100.5018, "approx": true},
     "text": [
       "Resilient Architecture by Design: Studio Projects & Pilot Interventions",
       "The year 2024 marked a turning point in how architectural education and research confront the realities of climate change and urban flooding. Through hands-on studio work, interdisciplinary collaboration, and site-based experimentation, students developed bold, adaptive, and context-sensitive design solutions across Thailand and beyond.",
@@ -93,6 +97,7 @@ export const THESIS = {
     "year": "2024",
     "title": "Coastal resilient architecture for flood adaptation",
     "by": "Natrawee Mesangpry",
+    "location": {"place": "Navotas, Philippines", "lat": 14.6667, "lng": 120.9417, "approx": false},
     "text": [
       "\"Climate Change and Coastal Flooding: The Case of Navotas, Philippines\"",
       "Climate change has led to rising sea levels, and the United Nations (UN) has projected that by 2050, many coastal cities around the world will face severe impacts. Island nations, in particular, are at high risk of being submerged due to land subsidence and coastal erosion. One such vulnerable area is Navotas City in the Philippines, which lies along the Manila Bay.",
@@ -128,6 +133,7 @@ export const THESIS = {
     "year": "2024",
     "title": "Oasis mosque Ethiopie",
     "by": "Visava Nilrod",
+    "location": {"place": "Ethiopia", "lat": 9.03, "lng": 38.74, "approx": true},
     "text": [
       "Resilient Architecture by Design: Studio Projects & Pilot Interventions",
       "The year 2024 marked a turning point in how architectural education and research confront the realities of climate change and urban flooding. Through hands-on studio work, interdisciplinary collaboration, and site-based experimentation, students developed bold, adaptive, and context-sensitive design solutions across Thailand and beyond.",
@@ -153,6 +159,7 @@ export const THESIS = {
     "year": "2024",
     "title": "War shelter",
     "by": "Vasita Saleekij",
+    "location": {"place": "Zaporizhzhia, Ukraine", "lat": 47.8388, "lng": 35.1396, "approx": false},
     "text": [
       "A Refuge in the Time of War. Amid the intensifying war situation in 2024, Ukraine, especially the area surrounding the Zaporizhzhia nuclear power plant, faces a tremendous threat from potential attacks involving radioactive contamination. For civilians, survival now means more than avoiding conventional weapons; it involves confronting invisible dangers. The silent devastation of radiation could turn hundreds of thousands of lives into nothing more than dust in the pages of history.",
       "The WAR SHELTER project was proposed as a high-level underground shelter design concept. It is not merely a protective facility but a sanctuary of hope, a place to restore life and offer humanity the chance to begin again in the midst of devastation.",
@@ -185,6 +192,7 @@ export const THESIS = {
     "year": "2024",
     "title": "Tsunami disaster learning and research center",
     "by": "Kotchakorn Saimangkla",
+    "location": {"place": "Andaman coast, Thailand", "lat": 8.6493, "lng": 98.2539, "approx": true},
     "text": [
       "Twenty years ago, a massive earthquake in the Indian Ocean triggered a devastating tsunami that caused severe damage and loss of life and property in multiple countries, including southern provinces of Thailand along the Andaman coast. The event exposed the unpredictability and suddenness of natural disasters, highlighting Thailand’s lack of awareness, early warning systems, and evacuation plans at that time.",
       "This disaster raised public awareness about the importance of coexisting with nature. Today, natural disasters occur more frequently and with increasing severity. Although Thailand is not considered a high-risk country like Japan, Indonesia, or China, the possibility of major disasters still exists. The 2004 tsunami had a serious impact on Thailand’s economy, reducing GDP growth and causing losses across various sectors, tourism, real estate, fisheries, and agriculture, amounting to tens of billions of baht. Local communities also suffered from a loss of livelihood and declining tourism.",
@@ -213,6 +221,7 @@ export const THESIS = {
     "year": "2024",
     "title": "Adaptive architecture and seismic resilience",
     "by": "Nimit Sittichai",
+    "location": {"place": "Indonesia", "lat": -6.2088, "lng": 106.8456, "approx": true},
     "text": [
       "Global warming today is a major issue that contributes to various natural disasters such as droughts, storms, floods, and earthquakes. Among these, earthquakes cause severe damage to housing and human lives. Victims are often forced to evacuate to safe areas, and if architecture cannot adequately adapt to accommodate them, it lacks resilience and may lead to abandoned buildings.",
       "According to statistics from the past decade, Indonesia is the country with the highest frequency of earthquakes, experiencing approximately 1,000–2,000 quakes per year. Although the magnitude typically ranges between 0.1 and 0.9 on the Richter scale, the impacts are often severe, including loss of life, destruction of property, collapsed buildings, and damaged roads. Earthquakes can also trigger other natural disasters. Moreover, a large portion of Indonesia’s population lives in high-risk zones.",
@@ -244,6 +253,7 @@ export const THESIS = {
     "title": "Architectural Approaches for Wildland Fire Resilience",
     "titleTh": "สถาปัตยกรรมเพื่อความยืดหยุ่นต่อไฟป่าในพื้นที่รอยต่อ",
     "by": "Tinnapop Jongjareanpornsuk",
+    "location": {"place": "Sierra Madre, Los Angeles, USA", "lat": 34.1617, "lng": -118.0529, "approx": false},
     "text": [
       "This thesis proposes the concept of Coexistence Architecture, an architectural approach that seeks to establish a relationship between humans, nature, architecture, risk, and change. The project is situated within the Wildland–Urban Interface (WUI) of Los Angeles County, where urban communities intersect with natural landscapes that are increasingly vulnerable to wildfires.",
       "Rather than viewing architecture solely as a means of “defending against wildfire,” the project redefines architecture as a mediator that can prevent, respond, adapt, and regenerate in relation to wildfire. It embraces wildfire as part of the natural transformation of the landscape and develops an architectural system capable of responding to uncertainty and environmental change over time."
@@ -295,6 +305,7 @@ export const THESIS = {
     "title": "Ecological Reclaiming: Architecture for Lost Coastal Territories",
     "titleTh": "สถาปัตยกรรมฟื้นคืน ต้นแบบระบบนิเวศแนวตั้งเพื่อการฟื้นฟูพื้นที่ชายฝั่ง ทะเลอ่าวไทย",
     "by": "Sirilak Kachin",
+    "location": {"place": "Bang Khun Thian, Bangkok", "lat": 13.5167, "lng": 100.4333, "approx": false},
     "text": [
       "This project explores a future model of coastal resilience in response to sea level rise, ecosystem degradation, and freshwater scarcity. Located in Bang Khun Thian, Bangkok’s only coastal district, the proposal introduces a floating vertical ecosystem that transforms polluted seawater into clean and potable water through integrated ecological and technological filtration systems. Acting as both regenerative infrastructure and a new coastal ecology, the project restores biodiversity, generates freshwater resources, and redefines architecture as an adaptive environmental system for future coastal communities."
     ],
@@ -364,6 +375,7 @@ export const THESIS = {
     "title": "Food Resilience Architecture: A Flexible System for Crisis-Adapted Communities",
     "titleTh": "สถาปัตยกรรมเพื่อความมั่นคงทางอาหาร ระบบยืดหยุ่นเพื่อชุมชนในภาวะวิกฤต",
     "by": "Yada Sriboonpong",
+    "location": {"place": "Zamzam Camp, Darfur, Sudan", "lat": 13.48, "lng": 25.33, "approx": false},
     "text": [
       "This project proposes a flexible food resilience infrastructure for conflict-affected refugee settlements in Zamzam, Darfur, Sudan. In situations where food supply, water, energy, and external aid can become uncertain or disrupted, conventional relief systems often provide only temporary solutions. The project therefore integrates food production, water treatment, energy generation, and resource recovery within a modular architectural system. Its deployable structure allows the system to adapt, expand, and reorganize in response to changing needs and available resources. Architecture becomes more than a shelter or service facility—it becomes a productive and resilient infrastructure that enables communities to maintain essential resources, adapt to disruption, and recover more quickly."
     ],
@@ -412,6 +424,7 @@ export const THESIS = {
     "year": "2026",
     "title": "Beyond the Road: Resilient Infrastructure",
     "by": "Thawanrat Nantasen",
+    "location": {"place": "Bangkok, Thailand", "lat": 13.7563, "lng": 100.5018, "approx": true},
     "text": [],
     "pages": [
       "p4_2026-page-1.jpg",

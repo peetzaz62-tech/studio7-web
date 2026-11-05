@@ -1,9 +1,9 @@
 import PageHero from '../components/PageHero.jsx'
-import { ALUMNI } from '../data/pages.js'
-
-const img = (f) => `./img/${f}`
+import { imgUrl as img, thumbUrl as thumb } from '../media.js'
+import { useContent } from '../content.jsx'
 
 export default function Alumni() {
+  const { ALUMNI } = useContent()
   return (
     <>
       <PageHero kicker="Alumni" title="Alumni" accent="pink" />
@@ -35,7 +35,7 @@ export default function Alumni() {
           <div className="people">
             {ALUMNI.tutors.map((t) => (
               <div key={t.name} className="person">
-                <span className="person-photo"><img src={img(t.photo)} alt="" loading="lazy" /></span>
+                <span className="person-photo"><img src={thumb(t.photo)} alt="" loading="lazy" /></span>
                 <span className="person-name">{t.name}</span>
               </div>
             ))}

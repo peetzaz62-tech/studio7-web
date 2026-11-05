@@ -1,7 +1,8 @@
 import PageHero from '../components/PageHero.jsx'
-import { SUBMISSION } from '../data/pages.js'
+import { useContent } from '../content.jsx'
 
 export default function Submission() {
+  const { SUBMISSION } = useContent()
   return (
     <>
       <PageHero kicker="Submission" title="Project submission" accent="red" />

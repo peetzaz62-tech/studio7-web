@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import PageHero from '../components/PageHero.jsx'
 import { useGallery } from '../components/Lightbox.jsx'
-import { PROJECTS } from '../data/projects.js'
-
-const img = (f) => `./img/${f}`
+import ThesisMap from '../components/ThesisMap.jsx'
+import { imgUrl as img, thumbUrl as thumb } from '../media.js'
+import { useContent } from '../content.jsx'
 const initials = (n) => n.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase()
 
 function Person({ p }) {
   const inner = (
     <>
       <span className="person-photo">
-        {p.photo ? <img src={img(p.photo)} alt="" loading="lazy" /> : <span className="initials" aria-hidden="true">{initials(p.name)}</span>}
+        {p.photo ? <img src={thumb(p.photo)} alt="" loading="lazy" /> : <span className="initials" aria-hidden="true">{initials(p.name)}</span>}
       </span>
       <span className="person-name">{p.name}{p.link && <i aria-hidden="true"> →</i>}</span>
     </>
@@ -21,6 +21,7 @@ function Person({ p }) {
 }
 
 export default function Project({ year }) {
+  const { PROJECTS, THESIS } = useContent()
   const d = PROJECTS[year]
   const [show, lightbox] = useGallery()
   const [all, setAll] = useState(false)
@@ -63,7 +64,7 @@ export default function Project({ year }) {
           {w.photos && (
             <div className="trio">
               {w.photos.map((f, i) => (
-                <button key={f} onClick={() => show(w.photos, i)} aria-label="ดูรูปขนาดใหญ่"><img src={img(f)} alt="" loading="lazy" /></button>
+                <button key={f} onClick={() => show(w.photos, i)} aria-label="ดูรูปขนาดใหญ่"><img src={thumb(f)} alt="" loading="lazy" /></button>
               ))}
             </div>
           )}
@@ -71,7 +72,7 @@ export default function Project({ year }) {
             <>
               <div className="gallery">
                 {(all ? gallery : gallery.slice(0, 8)).map((f, i) => (
-                  <button key={f} onClick={() => show(gallery, i)} aria-label={`รูปที่ ${i + 1}`}><img src={img(f)} alt="" loading="lazy" /></button>
+                  <button key={f} onClick={() => show(gallery, i)} aria-label={`รูปที่ ${i + 1}`}><img src={thumb(f)} alt="" loading="lazy" /></button>
                 ))}
               </div>
               {!all && gallery.length > 8 && (
@@ -95,7 +96,7 @@ export default function Project({ year }) {
               {d.thesis.map((t, i) => {
                 const body = (
                   <>
-                    <span className="thesis-img"><img src={img(t.img)} alt={t.title} loading="lazy" /></span>
+                    <span className="thesis-img"><img src={thumb(t.img)} alt={t.title} loading="lazy" /></span>
                     <span className="thesis-text">
                       <span className="thesis-no">{String(i + 1).padStart(2, '0')}</span>
                       {t.title && <strong>{t.title}</strong>}
@@ -114,6 +115,7 @@ export default function Project({ year }) {
           )}
         </div>
       </section>
+      {d.thesis.length > 0 && Object.values(THESIS).some((t) => t.year === year && t.location) && <ThesisMap year={year} title={`Thesis ${year} around the world`} />}
       {lightbox}
     </>
   )

@@ -1,9 +1,7 @@
 import { useGallery } from '../components/Lightbox.jsx'
 import Video from '../components/Video.jsx'
-import { THESIS } from '../data/thesis.js'
-import { PROJECTS } from '../data/projects.js'
-
-const img = (f) => `./img/${f}`
+import { imgUrl as img, thumbUrl as thumb } from '../media.js'
+import { useContent } from '../content.jsx'
 
 function Grid({ items, cls, onOpen, caption }) {
   return (
@@ -11,7 +9,7 @@ function Grid({ items, cls, onOpen, caption }) {
       {items.map((f, i) => (
         <figure key={f}>
           <button type="button" onClick={() => onOpen(items, i)} aria-label="ดูรูปขนาดใหญ่">
-            <img src={img(f)} alt="" loading="lazy" />
+            <img src={thumb(f)} alt="" loading="lazy" />
           </button>
           {caption && <figcaption>{caption}</figcaption>}
         </figure>
@@ -21,6 +19,7 @@ function Grid({ items, cls, onOpen, caption }) {
 }
 
 export default function Thesis({ slug }) {
+  const { THESIS, PROJECTS } = useContent()
   const t = THESIS[slug]
   const [show, lightbox] = useGallery()
   const accent = PROJECTS[t.year]?.accent || 'cyan'
@@ -31,7 +30,7 @@ export default function Thesis({ slug }) {
       <section className={`thesis-hero accent-${accent}`}>
         {t.hero && <img className="thesis-hero-bg" src={img(cover)} alt="" />}
         <div className="wrap thesis-hero-inner">
-          <a className="back-link" href={`#projects-${t.year}`}>← Back to Projects {t.year}</a>
+          <a className="back-link" href={`/projects/${t.year}`}>← Back to Projects {t.year}</a>
           <span className={`tag tag-${accent}`}>Thesis {t.year}</span>
           <h1>{t.title}</h1>
           {t.titleTh && <p className="thesis-th">{t.titleTh}</p>}
@@ -115,7 +114,7 @@ export default function Thesis({ slug }) {
       )}
 
       <section className="wrap thesis-foot">
-        <a className="btn btn-ghost-dark" href={`#projects-${t.year}`}>← Back to Projects {t.year}</a>
+        <a className="btn btn-ghost-dark" href={`/projects/${t.year}`}>← Back to Projects {t.year}</a>
       </section>
       {lightbox}
     </>

@@ -1,9 +1,16 @@
-// Cloudflare Workers (static assets) — ใช้คู่กับ Deploy command: npx wrangler deploy
+// Cloudflare Worker ของเว็บ: Workers Builds รัน `npm run build` แล้ว `npx wrangler deploy` ทุกครั้งที่ push ขึ้น main
 {
   "name": "rmuttstudio7-web",
+  "main": "worker/index.js",
   "compatibility_date": "2025-09-01",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
-  }
+    "binding": "ASSETS",
+    "not_found_handling": "single-page-application",
+    // ให้ Worker จัดการทุกหน้า (ใส่ meta + เนื้อหาล่าสุด) ยกเว้นไฟล์ static ที่ส่งตรงได้เลย
+    "run_worker_first": ["/*", "!/assets/*", "!/img/*"]
+  },
+  // KV เก็บเนื้อหาที่แก้จาก dashboard + รูปที่อัปโหลด — ไม่ต้องใส่ id: wrangler สร้างให้อัตโนมัติตอน deploy ครั้งแรก
+  "kv_namespaces": [{ "binding": "SITE" }],
+  "observability": { "enabled": true }
 }

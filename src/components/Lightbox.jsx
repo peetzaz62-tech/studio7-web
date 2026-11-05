@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 
-const img = (f) => `./img/${f}`
+import { imgUrl as img } from '../media.js'
 
 function Lightbox({ items, index, onClose, onMove }) {
   useEffect(() => {

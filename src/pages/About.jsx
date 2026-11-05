@@ -1,9 +1,9 @@
 import PageHero from '../components/PageHero.jsx'
-import { ABOUT } from '../data/about.js'
-
-const img = (f) => `./img/${f}`
+import { imgUrl as img, thumbUrl as thumb } from '../media.js'
+import { useContent } from '../content.jsx'
 
 export default function About() {
+  const { ABOUT } = useContent()
   return (
     <>
       <PageHero kicker="About us" title="Resilient architecture" subtitle="Faculty of Architecture, RMUTT · Water Adaptation Innovation Center" accent="yellow" />
@@ -46,7 +46,7 @@ export default function About() {
         <div className="pillars">
           {ABOUT.pillars.map((p) => (
             <figure key={p.title}>
-              <img src={img(p.img)} alt="" loading="lazy" />
+              <img src={thumb(p.img)} alt="" loading="lazy" />
               <figcaption>{p.title}</figcaption>
             </figure>
           ))}
