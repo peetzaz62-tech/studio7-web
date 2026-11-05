@@ -3,17 +3,15 @@ import PageHero from '../components/PageHero.jsx'
 import SectionHead from '../components/SectionHead.jsx'
 import { useGallery } from '../components/Lightbox.jsx'
 import ThesisMap from '../components/ThesisMap.jsx'
+import PersonPhoto from '../components/PersonPhoto.jsx'
 import { imgUrl as img, thumbUrl as thumb } from '../media.js'
 import { useContent } from '../content.jsx'
 
-const initials = (n) => n.split(/\s+/).map((w) => w[0]).slice(0, 2).join('').toUpperCase()
 
 function Person({ p, i }) {
   const inner = (
     <>
-      <span className="person-photo">
-        {p.photo ? <img src={thumb(p.photo)} alt="" loading="lazy" /> : <span className="initials" aria-hidden="true">{initials(p.name)}</span>}
-      </span>
+      <PersonPhoto photo={p.photo} name={p.name} />
       <span className="person-name">{p.name}</span>
       {p.link && <span className="person-more mono">ดูผลงาน →</span>}
     </>

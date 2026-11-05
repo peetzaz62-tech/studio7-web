@@ -176,23 +176,38 @@ export default {
       }
       if (pathname === '/api/upload' && method === 'POST') {
         const type = req.headers.get('content-type') || ''
-        const ext = { 'image/webp': 'webp', 'image/jpeg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'image/svg+xml': 'svg' }[type]
-        if (!ext) return json({ error: 'รองรับเฉพาะไฟล์รูป (webp, jpg, png, gif)' }, 415)
+        const ext = { 'image/webp': 'webp', 'image/jpeg': 'jpg', 'image/png': 'png', 'image/gif': 'gif' }[type]
+        if (!ext) return json({ error: 'รองรับเฉพาะไฟล์รูป JPG, PNG, WebP หรือ GIF' }, 415)
         const buf = await req.arrayBuffer()
         if (buf.byteLength > MAX_UPLOAD) return json({ error: 'รูปใหญ่เกิน 10 MB' }, 413)
-        const id = `${Date.now().toString(36)}-${crypto.randomUUID().slice(0, 8)}.${ext}`
+        // ?thumb=<id ของรูปเต็ม> = อัปโหลดรูปย่อของรูปนั้น เก็บเป็น <ชื่อ>-sm.<นามสกุล>
+        const thumbOf = url.searchParams.get('thumb')
+        let id
+        if (thumbOf) {
+          if (!/^[a-z0-9]+-[a-z0-9]{8}\.(webp|jpg|png|gif)$/.test(thumbOf)) return json({ error: 'รหัสรูปไม่ถูกต้อง' }, 400)
+          if (ext !== 'webp') return json({ error: 'รูปย่อต้องเป็น WebP' }, 415)
+          id = thumbOf.replace(/\.(\w+)$/, '-sm.webp')
+        } else {
+          id = `${Date.now().toString(36)}-${crypto.randomUUID().slice(0, 8)}.${ext}`
+        }
         await env.SITE.put(`media:${id}`, buf, { metadata: { type, size: buf.byteLength, at: new Date().toISOString() } })
-        return json({ ok: true, url: `/media/${id}` })
+        return json({ ok: true, id, url: `/media/${id}`, size: buf.byteLength })
       }
       return json({ error: 'ไม่พบ API นี้' }, 404)
     }
 
     if (pathname.startsWith('/media/')) {
       const id = pathname.slice(7)
-      if (!env.SITE || !/^[a-z0-9-]+\.(webp|jpg|png|gif|svg)$/.test(id)) return new Response('Not found', { status: 404 })
-      const { value, metadata } = await env.SITE.getWithMetadata(`media:${id}`, { type: 'arrayBuffer', cacheTtl: 86400 })
-      if (!value) return new Response('Not found', { status: 404 })
-      return new Response(value, { headers: { 'content-type': metadata?.type || 'application/octet-stream', 'cache-control': 'public, max-age=31536000, immutable' } })
+      if (!env.SITE || !/^[a-z0-9-]+\.(webp|jpg|png|gif)$/.test(id)) return new Response('Not found', { status: 404 })
+      let hit = await env.SITE.getWithMetadata(`media:${id}`, { type: 'arrayBuffer', cacheTtl: 86400 })
+      // รูปที่อัปโหลดก่อนมีระบบรูปย่อ: ขอ -sm แล้วไม่มี → ส่งรูปเต็มแทน
+      if (!hit.value && /-sm\.\w+$/.test(id)) {
+        const base = id.replace(/-sm(\.\w+)$/, '')
+        const { keys } = await env.SITE.list({ prefix: `media:${base}.` })
+        if (keys[0]) hit = await env.SITE.getWithMetadata(keys[0].name, { type: 'arrayBuffer', cacheTtl: 86400 })
+      }
+      if (!hit.value) return new Response('Not found', { status: 404 })
+      return new Response(hit.value, { headers: { 'content-type': hit.metadata?.type || 'application/octet-stream', 'cache-control': 'public, max-age=31536000, immutable', 'x-content-type-options': 'nosniff' } })
     }
 
     if (pathname === '/sitemap.xml') {

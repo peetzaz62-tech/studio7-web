@@ -1,31 +1,37 @@
-// ปิดหน้าโหลด (#boot ใน index.html) เมื่อฟอนต์และรูปหลักของหน้าพร้อม
-// ครั้งแรกของ session แสดงครบ animation (1.6 วิ) ครั้งต่อไปสั้นลง; ไม่เกิน 4.5 วิ แม้รูปยังโหลดไม่เสร็จ
-const MIN_FIRST = 1600
-const MIN_AGAIN = 700
-const MAX_WAIT = 4500
-
-function seen() {
-  try { const v = sessionStorage.getItem('s7-boot'); sessionStorage.setItem('s7-boot', '1'); return !!v } catch { return false }
-}
+// หน้าโหลดครั้งแรก (#boot ใน index.html) — แสดงเฉพาะการเข้าเว็บครั้งแรก หรือห่างจากครั้งล่าสุดเกิน 30 วัน
+// (สคริปต์ใน <head> ตัดสินใจแล้วใส่ class "no-intro" หรือ "boot-lock" ให้ <html>)
+// ปิดเมื่อฟอนต์และรูปหลักพร้อม: อย่างน้อย 2.4 วิ (ให้ animation ครบ) ไม่เกิน 5 วิ
+const MIN_SHOW = 2400
+const MAX_WAIT = 5000
 
 function imageReady(img) {
   if (!img || (img.complete && img.naturalWidth)) return Promise.resolve()
   return new Promise((r) => { img.addEventListener('load', r, { once: true }); img.addEventListener('error', r, { once: true }) })
 }
 
+function markBooted() {
+  const root = document.documentElement
+  root.classList.remove('boot-lock')
+  root.classList.add('booted')
+  window.dispatchEvent(new Event('s7:booted'))
+}
+
 export function finishBoot() {
   const el = document.getElementById('boot')
-  if (!el) { document.documentElement.classList.remove('boot-lock'); document.documentElement.classList.add('booted'); return }
-  const min = seen() ? MIN_AGAIN : MIN_FIRST
+  const root = document.documentElement
+  if (!el || root.classList.contains('no-intro') || location.pathname.startsWith('/admin')) {
+    el?.remove()
+    markBooted()
+    return
+  }
   const heroSrc = getComputedStyle(document.querySelector('.hero-bg') || document.body).backgroundImage.match(/url\("?([^")]+)/)?.[1]
   const heroImg = heroSrc ? Object.assign(new Image(), { src: heroSrc }) : document.querySelector('main img')
-  const ready = Promise.all([document.fonts?.ready, imageReady(heroImg)])
   const timer = (ms) => new Promise((r) => setTimeout(r, ms))
-  Promise.all([Promise.race([ready, timer(MAX_WAIT)]), timer(Math.max(0, min - performance.now()))]).then(() => {
+  const ready = Promise.all([document.fonts?.ready, imageReady(heroImg)])
+  Promise.all([Promise.race([ready, timer(MAX_WAIT)]), timer(Math.max(0, MIN_SHOW - performance.now()))]).then(() => {
+    try { localStorage.setItem('s7-intro', String(Date.now())) } catch { /* ไม่มี storage ก็แสดงครั้งต่อไปอีก */ }
     el.classList.add('done')
-    document.documentElement.classList.remove('boot-lock')
-    document.documentElement.classList.add('booted')
-    window.dispatchEvent(new Event('s7:booted'))
-    setTimeout(() => el.remove(), 1000)
+    markBooted()
+    setTimeout(() => el.remove(), 1100)
   })
 }

@@ -148,3 +148,4 @@
 .ad-status { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: .82rem; color: var(--muted); }
 .ad-status .ok { color: #2e7d32; font-weight: 700; }
 .ad-status .no { color: #c62828; font-weight: 700; }
+.ad-ok { color: #2e7d32; font-size: .82rem; }

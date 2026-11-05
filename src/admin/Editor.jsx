@@ -1,6 +1,6 @@
 import { useId, useRef, useState } from 'react'
 import { thumbUrl } from '../media.js'
-import { uploadImage } from './upload.js'
+import { uploadImage, formatSize } from './upload.js'
 import {
   LABELS, HINTS, COLORS, blank, summary,
   isImageKey, isImageListKey, isImageValue, isLongKey, isLinkKey,
@@ -19,25 +19,39 @@ function Hint({ k }) {
 
 function UploadButton({ multiple, onDone, children }) {
   const input = useRef(null)
-  const [busy, setBusy] = useState(false)
+  const [busy, setBusy] = useState('')
   const [err, setErr] = useState('')
+  const [note, setNote] = useState('')
   const pick = async (e) => {
     const files = [...e.target.files]
     e.target.value = ''
     if (!files.length) return
-    setBusy(true); setErr('')
-    try {
-      const urls = []
-      for (const f of files) urls.push(await uploadImage(f))
+    setErr(''); setNote('')
+    const urls = []
+    const errors = []
+    let before = 0
+    let after = 0
+    for (const [i, f] of files.entries()) {
+      setBusy(files.length > 1 ? `กำลังอัปโหลด ${i + 1}/${files.length}…` : 'กำลังอัปโหลด…')
+      try {
+        const r = await uploadImage(f)
+        urls.push(r.url); before += r.original; after += r.size
+      } catch (x) { errors.push(x.message) }
+    }
+    setBusy('')
+    if (urls.length) {
       onDone(urls)
-    } catch (x) { setErr(x.message) } finally { setBusy(false) }
+      setNote(`อัปโหลดแล้ว ${urls.length} รูป · ${formatSize(before)} → ${formatSize(after)}`)
+    }
+    if (errors.length) setErr(errors.join(' · '))
   }
   return (
     <>
-      <button type="button" className="ad-btn" disabled={busy} onClick={() => input.current.click()}>
-        {busy ? 'กำลังอัปโหลด…' : children}
+      <button type="button" className="ad-btn" disabled={!!busy} onClick={() => input.current.click()}>
+        {busy || children}
       </button>
-      <input ref={input} type="file" accept="image/*" multiple={multiple} hidden onChange={pick} />
+      <input ref={input} type="file" accept="image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif" multiple={multiple} hidden onChange={pick} />
+      {note && <span className="ad-ok" role="status">{note}</span>}
       {err && <span className="ad-err" role="alert">{err}</span>}
     </>
   )

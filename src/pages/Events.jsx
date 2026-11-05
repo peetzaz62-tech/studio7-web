@@ -160,7 +160,8 @@ export default function Events() {
 
       <ThesisMap no="03" />
 
-      <section id="lectures" className="section wrap">
+      <section id="lectures" className="section band">
+        <div className="wrap">
         <SectionHead no="04" kicker="Special Lectures" title="Special lecture" />
         <ol className="lecture-list">
           {LECTURE_LINKS.map((l, i) => (
@@ -176,9 +177,10 @@ export default function Events() {
         <div className="videos">
           {VIDEOS.map((v, i) => <div key={v.id} data-reveal style={{ '--d': i % 2 }}><Video id={v.id} title={v.title} /></div>)}
         </div>
+        </div>
       </section>
 
-      <section id="references" className="section band">
+      <section id="references" className="section">
         <div className="wrap">
           <SectionHead no="05" kicker="References" title="เอกสารอ้างอิง" />
           <div className="refs">

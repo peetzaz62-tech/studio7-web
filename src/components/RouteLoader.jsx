@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Logo from './Logo.jsx'
 
-// โหลดเปลี่ยนหน้า: ถ้ารูปบนจอแรกของหน้าใหม่ยังโหลดไม่เสร็จภายใน 180ms จะแสดงโลโก้น้ำเติม จนกว่ารูปจะพร้อม (สูงสุด 3 วิ)
+// โหลดเปลี่ยนหน้า: แสดงเฉพาะเมื่อรูปบนจอแรกของหน้าใหม่โหลดช้ากว่า 600ms (เน็ตช้า) — ปกติจะไม่เห็นเลย
 export default function RouteLoader({ path }) {
   const [show, setShow] = useState(false)
   const first = useRef(true)
@@ -9,7 +9,7 @@ export default function RouteLoader({ path }) {
     if (first.current) { first.current = false; return }
     let alive = true
     let shownAt = 0
-    const timer = setTimeout(() => { if (alive) { shownAt = performance.now(); setShow(true) } }, 180)
+    const timer = setTimeout(() => { if (alive) { shownAt = performance.now(); setShow(true) } }, 600)
     const imgs = [...document.querySelectorAll('main img')].filter((i) => i.getBoundingClientRect().top < innerHeight * 1.1 && !(i.complete && i.naturalWidth))
     const waits = imgs.map((i) => new Promise((r) => { i.addEventListener('load', r, { once: true }); i.addEventListener('error', r, { once: true }) }))
     Promise.race([Promise.all(waits), new Promise((r) => setTimeout(r, 3000))]).then(() => {

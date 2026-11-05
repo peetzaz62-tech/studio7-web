@@ -1,6 +1,6 @@
 import PageHero from '../components/PageHero.jsx'
 import SectionHead from '../components/SectionHead.jsx'
-import { thumbUrl as thumb } from '../media.js'
+import PersonPhoto from '../components/PersonPhoto.jsx'
 import { useContent } from '../content.jsx'
 
 export default function Alumni() {
@@ -33,7 +33,7 @@ export default function Alumni() {
           <div className="people">
             {ALUMNI.tutors.map((t, i) => (
               <div key={t.name} className="person" data-reveal style={{ '--d': i % 4 }}>
-                <span className="person-photo"><img src={thumb(t.photo)} alt="" loading="lazy" /></span>
+                <PersonPhoto photo={t.photo} name={t.name} />
                 <span className="person-name">{t.name}</span>
               </div>
             ))}
