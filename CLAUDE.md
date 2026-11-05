@@ -24,3 +24,11 @@ Live: https://rmuttstudio7-web.peetzaz.workers.dev — Worker `rmuttstudio7-web`
 - `p4-2026` text on Google Sites was a copy of p1-2024; only images were migrated.
 - Alumni Generation 4 (2027) lists the same names as Generation 3 on the original.
 - Several thesis map locations are approximate (`location.approx: true`).
+
+## Status (handoff, 2026-11-05)
+- Live on `main` (868ba99): migrated site, path URLs + WebP, admin dashboard (KV + `ADMIN_PASSWORD` set as a **Runtime** Secret, not a Build variable), drafting-style redesign, first-visit intro, globe, upload thumbnails, light dashboard with page-register overview and live preview pane.
+- Workflow agreed with the owner: work on a branch, show screenshots/video, **ask before merging to `main`** (every push to `main` deploys).
+- Local test password lives in `.dev.vars` (gitignored). Reset local KV with `rm -rf .wrangler/state`. `wrangler dev` crashes if `dist/` is rebuilt while it runs — restart it after `npm run build`.
+- Cloud sessions so far could not reach the live `*.workers.dev` URL; verify locally with `wrangler dev` + Playwright.
+- Open content questions for the owner: 19.01.27 labelled WED (is Tuesday) and 21.07.25 labelled TUE (is Monday) on the original site; footer email shown as info@rastudio7.co.th but the original mailto was info@ras7.co.th; two 2026 thesis cards have no title; 4 participants in 2025 have no photo; Projects 2027 and Alumni Gen 4 are placeholders.
+- Offered but not built: TH/EN language toggle, site search, flip-book portfolio viewer, custom domain.
