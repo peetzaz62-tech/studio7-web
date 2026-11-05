@@ -31,15 +31,12 @@ npm run build        # ได้เว็บพร้อมขึ้นโฮส
 | `src/data/pages.js` | Submission, Alumni, Download |
 | `public/img/` | รูปทั้งหมด |
 
-## ขึ้นเว็บจริงด้วย Cloudflare Pages
-1. Cloudflare Dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**
-2. เลือก repo นี้
-3. ตั้งค่า build:
-   - Framework preset: **Vite** (หรือ None)
-   - Build command: `npm run build`
-   - Build output directory: `dist`
-4. กด **Save and Deploy** — ทุกครั้งที่ push ขึ้น `main` Cloudflare จะ build และอัปเดตเว็บให้อัตโนมัติ
-5. (ถ้ามีโดเมน) Pages project → **Custom domains** → ใส่โดเมน เช่น `deresilient.com`
+## ขึ้นเว็บจริงด้วย Cloudflare (Workers + static assets)
+โปรเจกต์นี้ deploy เป็น Cloudflare Worker ชื่อ `studio7-web` ที่เสิร์ฟไฟล์จาก `dist/` (ตั้งค่าใน `wrangler.jsonc`)
+- Build command: `npm run build`
+- Deploy command: `npx wrangler deploy`
+- ทุกครั้งที่ push ขึ้น `main` Cloudflare จะ build และ deploy ให้อัตโนมัติ
+- ผูกโดเมน: Cloudflare Dashboard → Workers & Pages → studio7-web → **Domains**
 
 ## เวอร์ชันพรีวิวบน claude.ai
 `npm run build:artifact` สร้าง `artifact/index.html` (ฝัง CSS/JS ในไฟล์เดียว, แสดงวิดีโอเป็นลิงก์แทนการฝัง)

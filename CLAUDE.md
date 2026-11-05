@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 Static React 18 + Vite 5 site for "Resilient Architecture by Studio 7" (RMUTT), migrated from Google Sites.
-Deployed on Cloudflare Pages: build `npm run build`, output `dist/`.
+Deployed as a Cloudflare Worker with static assets (`wrangler.jsonc`, worker name `studio7-web`): Workers Builds runs `npm run build` then `npx wrangler deploy` on every push to `main`.
 
 ## Architecture
 - No router library. `src/router.js` routes on a plain `location.hash` (`#events`, `#projects-2025`, `#thesis-tinn`).
