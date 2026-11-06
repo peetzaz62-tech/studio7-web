@@ -77,6 +77,57 @@ function validContent(data) {
   return null
 }
 
+// ---------- backup (ย้ายบัญชี Cloudflare) ----------
+async function listAll(env, prefix) {
+  const out = []
+  let cursor
+  do {
+    const r = await env.SITE.list({ prefix, cursor })
+    out.push(...r.keys)
+    cursor = r.list_complete ? null : r.cursor
+  } while (cursor)
+  return out
+}
+function toB64(buf) {
+  const b = new Uint8Array(buf)
+  let s = ''
+  for (let i = 0; i < b.length; i += 0x8000) s += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000))
+  return btoa(s)
+}
+function fromB64(s) {
+  const bin = atob(s)
+  const b = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) b[i] = bin.charCodeAt(i)
+  return b
+}
+async function exportAll(env) {
+  const history = []
+  for (const k of await listAll(env, 'history:')) history.push({ key: k.name, metadata: k.metadata || {}, data: await env.SITE.get(k.name, { type: 'json' }) })
+  const media = []
+  for (const k of await listAll(env, 'media:')) {
+    const hit = await env.SITE.getWithMetadata(k.name, { type: 'arrayBuffer' })
+    if (hit.value) media.push({ id: k.name.slice(6), metadata: hit.metadata || {}, b64: toB64(hit.value) })
+  }
+  return { kind: 'studio7-backup', version: 1, at: new Date().toISOString(), content: await getStored(env), history, media }
+}
+async function importAll(env, b) {
+  if (!b || b.kind !== 'studio7-backup' || b.version !== 1) return 'ไฟล์นี้ไม่ใช่ไฟล์สำรองของเว็บนี้'
+  if (b.content != null) { const err = validContent(b.content); if (err) return err }
+  const media = Array.isArray(b.media) ? b.media : []
+  const history = Array.isArray(b.history) ? b.history : []
+  for (const m of media) if (!/^[a-z0-9-]+\.(webp|jpg|png|gif)$/.test(m?.id || '') || typeof m.b64 !== 'string') return 'ไฟล์สำรองมีรูปที่ชื่อไม่ถูกต้อง'
+  for (const h of history) if (!/^history:[0-9T:.\-Z]+$/.test(h?.key || '') || validContent(h.data)) return 'ไฟล์สำรองมีประวัติที่ไม่ถูกต้อง'
+  for (const m of media) {
+    const buf = fromB64(m.b64)
+    if (buf.byteLength > MAX_UPLOAD) return `รูป ${m.id} ใหญ่เกินไป`
+    const type = { webp: 'image/webp', jpg: 'image/jpeg', png: 'image/png', gif: 'image/gif' }[m.id.split('.').pop()]
+    await env.SITE.put(`media:${m.id}`, buf, { metadata: { ...m.metadata, type } })
+  }
+  for (const h of history) await env.SITE.put(h.key, JSON.stringify(h.data), { metadata: h.metadata || {} })
+  if (b.content != null) await saveContent(env, b.content, `นำเข้าจากไฟล์สำรอง ${String(b.at || '').slice(0, 10)}`)
+  return null
+}
+
 // ---------- HTML ----------
 const esc = (s = '') => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c])
 
@@ -173,6 +224,18 @@ export default {
         if (!data) return json({ error: 'ไม่พบเวอร์ชันนี้' }, 404)
         const at = await saveContent(env, data, `กู้คืนจาก ${key.slice(8)}`)
         return json({ ok: true, at, content: mergeContent(data) })
+      }
+      if (pathname === '/api/backup' && method === 'GET') {
+        const b = await exportAll(env)
+        const name = `studio7-backup-${b.at.slice(0, 10)}.json`
+        return json(b, 200, { 'content-disposition': `attachment; filename="${name}"` })
+      }
+      if (pathname === '/api/backup' && method === 'POST') {
+        let b
+        try { b = await req.json() } catch { return json({ error: 'ไฟล์ไม่ใช่ JSON' }, 400) }
+        const err = await importAll(env, b)
+        if (err) return json({ error: err }, 400)
+        return json({ ok: true, content: mergeContent(await getStored(env)), media: (b.media || []).length, history: (b.history || []).length })
       }
       if (pathname === '/api/upload' && method === 'POST') {
         const type = req.headers.get('content-type') || ''

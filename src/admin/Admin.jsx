@@ -72,7 +72,52 @@ function Login({ onDone, configured, storage, unreachable }) {
 }
 
 /* ---------------------------------------------------------------- history */
-function History({ onRestore, onClose }) {
+function Backup({ onImported }) {
+  const [busy, setBusy] = useState('')
+  const [msg, setMsg] = useState('')
+  const [err, setErr] = useState('')
+  const download = async () => {
+    setBusy('down'); setErr(''); setMsg('')
+    try {
+      const res = await fetch('/api/backup', { credentials: 'same-origin' })
+      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `ดาวน์โหลดไม่สำเร็จ (${res.status})`)
+      const blob = await res.blob()
+      const a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = `studio7-backup-${new Date().toISOString().slice(0, 10)}.json`
+      a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 2000)
+      setMsg(`ดาวน์โหลดแล้ว (${(blob.size / 1048576).toFixed(1)} MB) — เก็บไฟล์นี้ไว้ แล้วนำเข้าในเว็บใหม่`)
+    } catch (x) { setErr(x.message) } finally { setBusy('') }
+  }
+  const upload = async (e) => {
+    const file = e.target.files?.[0]; e.target.value = ''
+    if (!file) return
+    if (!confirm(`นำเข้า "${file.name}"? เนื้อหาปัจจุบันจะถูกแทนด้วยเนื้อหาในไฟล์ (เวอร์ชันเดิมยังกู้คืนได้จากประวัติ)`)) return
+    setBusy('up'); setErr(''); setMsg('')
+    try {
+      const r = await api('/api/backup', { method: 'POST', body: await file.text() })
+      onImported(r.content)
+      setMsg(`นำเข้าแล้ว: รูป ${r.media} ไฟล์, ประวัติ ${r.history} เวอร์ชัน`)
+    } catch (x) { setErr(x.message) } finally { setBusy('') }
+  }
+  return (
+    <section className="ad-backup">
+      <h3>สำรองข้อมูล / ย้ายบัญชี</h3>
+      <p className="ad-hint">ไฟล์เดียวรวมเนื้อหาที่แก้ใน dashboard, รูปที่อัปโหลด และประวัติ ใช้ตอนย้ายบัญชี Cloudflare: ดาวน์โหลดจากเว็บเดิม แล้วนำเข้าที่เว็บใหม่</p>
+      <div className="ad-backup-row">
+        <button className="ad-btn" onClick={download} disabled={!!busy}>{busy === 'down' ? 'กำลังเตรียมไฟล์…' : '↓ ดาวน์โหลดไฟล์สำรอง'}</button>
+        <label className={`ad-btn ad-ghost ${busy ? 'is-disabled' : ''}`}>
+          {busy === 'up' ? 'กำลังนำเข้า…' : '↑ นำเข้าไฟล์สำรอง'}
+          <input type="file" accept="application/json,.json" onChange={upload} disabled={!!busy} hidden />
+        </label>
+      </div>
+      {msg && <p className="ad-ok">{msg}</p>}
+      {err && <p className="ad-err">{err}</p>}
+    </section>
+  )
+}
+
+function History({ onRestore, onClose, onImported }) {
   const [list, setList] = useState(null)
   const [err, setErr] = useState('')
   useEffect(() => { api('/api/history').then(setList).catch((x) => setErr(x.message)) }, [])
@@ -97,6 +142,7 @@ function History({ onRestore, onClose }) {
             </li>
           ))}
         </ol>
+        <Backup onImported={onImported} />
       </div>
     </div>
   )
@@ -386,7 +432,7 @@ export default function Admin() {
         <div className="ad-actions">
           <button className={`ad-btn ad-ghost ${showPreview ? 'is-on' : ''}`} aria-pressed={showPreview} onClick={() => setShowPreview((v) => !v)}>พรีวิว</button>
           <button className="ad-btn ad-ghost" onClick={() => navigate(viewPath)} title="เปิดหน้าเว็บเต็มจอพร้อมการแก้ไข (ยังไม่บันทึกก็ดูได้)">ดูหน้าเว็บ ↗</button>
-          <button className="ad-btn ad-ghost" onClick={() => setShowHistory(true)}>ประวัติ</button>
+          <button className="ad-btn ad-ghost" onClick={() => setShowHistory(true)}>ประวัติ · สำรอง</button>
           <button className="ad-btn ad-primary" disabled={!dirty || saving} onClick={save}>{saving ? 'กำลังบันทึก…' : 'บันทึก'}</button>
           <button className="ad-btn ad-ghost ad-logout" onClick={logout}>ออกจากระบบ</button>
         </div>
@@ -494,7 +540,7 @@ export default function Admin() {
       </div>
 
 
-      {showHistory && <History onRestore={restore} onClose={() => setShowHistory(false)} />}
+      {showHistory && <History onRestore={restore} onClose={() => setShowHistory(false)} onImported={(c) => { setContent(c); setSaved(JSON.stringify(c)); setStatus('นำเข้าไฟล์สำรองแล้ว') }} />}
     </div>
   )
 }

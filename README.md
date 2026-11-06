@@ -3,6 +3,8 @@
 เว็บไซต์ของ Resilient Architecture by Studio 7 (Faculty of Architecture, RMUTT)
 React + Vite + Cloudflare Worker — https://rmuttstudio7-web.peetzaz.workers.dev
 
+ย้ายบัญชี GitHub/Cloudflare: ดู [MIGRATION.md](MIGRATION.md)
+
 ## หน้าในเว็บ
 | ลิงก์ | หน้า |
 |---|---|

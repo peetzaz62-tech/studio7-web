@@ -327,3 +327,10 @@
   .ad-body.has-preview { grid-template-columns: 1fr; }
   .ad-preview { width: 100vw; top: 0; z-index: 45; padding-top: env(safe-area-inset-top, 0px); }
 }
+
+/* backup / migrate */
+.ad-backup { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--line-2); }
+.ad-backup h3 { font-size: 1.05rem; margin: 0 0 4px; }
+.ad-backup-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 6px; }
+.ad-backup label.ad-btn { cursor: pointer; }
+.ad-backup .is-disabled { opacity: .5; pointer-events: none; }
